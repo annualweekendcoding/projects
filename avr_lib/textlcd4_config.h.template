@@ -1,0 +1,21 @@
+// 4-Bit Daten liegen immer auf Bit0-3 des LCD-PORT
+
+#define LCD_PORT            ( PORTD )
+#define LCD_PIN             ( PIND )
+#define LCD_DDR             ( DDRD )
+
+#define LCD_RS_BIT          ( PD6 )
+#define LCD_E1_BIT          ( PD4 )
+#define LCD_E2_BIT          ( PD5 )
+
+// Nur der RW-Ausgang liegt möglicherweise auf einem anderen Port
+
+#define LCD_RW_PORT         ( PORTB )
+#define LCD_RW_DDR          ( DDRB )
+#define LCD_RW_BIT          ( PB4 )
+
+#define CHARS_PER_LINE      ( 27U )
+#define LCD_READ_DELAY_US   ( 20U )
+#define LCD_WRITE_DELAY_US  ( 20U )
+
+// **** Ende der Konfiguration
