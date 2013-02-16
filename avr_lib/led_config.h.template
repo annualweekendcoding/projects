@@ -1,0 +1,19 @@
+// Konfiguration der LED-Ausgänge
+
+// Folgende LED-Namen werden unterstützt:
+/*
+ LED
+ LED1-LED9
+ RED
+ GREEN
+ YELLOW
+*/
+
+// andere Namen können benutzt werden, es muss dann aber LED_INIT(NAME) aufgerufen werden.
+
+
+#define LED_DDR DDRB
+#define LED_PORT PORTB
+#define LED_BIT 0
+
+#define LED_FLASHTIME 50

@@ -1,9 +1,29 @@
 #ifndef _LED_H
 #define _LED_H
 
+// Funktionen für die einfache LED-Ansteuerung für Signale, Debugging etc.
+// Einbinden wie folgt:
+// 1. Datei led_config.h.template in das Projektverzeichnis als led_config.h kopieren
+// 2. Datei led_config.h entsprechend den realen Ports und Pins abändern
+// 3. folgende Includes in das Programm aufnehmen 
+/*
 #include "led_config.h"
+#include "led.h"
+*/
+// 4. Am Anfang von main() led_init(); aufrufen
 
+// Folgende LED-Namen werden unterstützt:
+/*
+ LED
+ LED1-LED9
+ RED
+ GREEN
+ YELLOW
+*/
 
+// andere Namen können benutzt werden, es muss dann aber LED_INIT(NAME) aufgerufen werden.
+
+#include <util/delay.h>
 
 #define LED_INIT(LED) ( LED##_DDR |= (1<<LED##_BIT) )
 
