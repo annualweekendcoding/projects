@@ -1,5 +1,7 @@
 package com.example.Teichroboter;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,24 +20,46 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        andropodTransceiver.Resume();
+        andropodTransceiver.resumeTransceiver();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        andropodTransceiver.suspendTransceiver();
+        super.onDestroy();
     }
 
     public void onButtonClick(View view) {
         textView = (TextView) findViewById(R.id.textView);
-        if (andropodTransceiver.IsOpen()) {
-            byte[] buffer = "On \r\n".getBytes();//{1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-            andropodTransceiver.Write(buffer, 5);
-            textView.setText("On gesendet");
+        if (andropodTransceiver.isOpen()) {
+            byte[] buffer = {1};
+            try
+            {
+                andropodTransceiver.write(AndropodTransceiver.Type.APOD_TELTYPE_DATA, (short)1, buffer);
+                textView.setText("On gesendet");
+            }
+            catch (IOException e)
+            {
+                textView.setText("On senden fehlgeschlagen: " + e.getLocalizedMessage());
+            }
         }
     }
 
-    public void offButtonClick(View view) {
+    public void offButtonClick(View view)
+    {
         textView = (TextView) findViewById(R.id.textView);
-        if (andropodTransceiver.IsOpen()) {
-            byte[] buffer = "Off \r\n".getBytes(); //{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            andropodTransceiver.Write(buffer, 6);
-            textView.setText("Off gesendet");
+        if (andropodTransceiver.isOpen()) {
+            byte[] buffer = {0};
+            try
+            {
+                andropodTransceiver.write(AndropodTransceiver.Type.APOD_TELTYPE_DATA, (short)1, buffer);
+                textView.setText("Off gesendet");
+            }
+            catch (IOException e)
+            {
+                textView.setText("Off senden fehlgeschlagen: " + e.getLocalizedMessage());
+            }
         }
     }
 

@@ -4,58 +4,103 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mirko
- * Date: 16.02.13
- * Time: 20:13
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: mirko Date: 16.02.13 Time: 20:13
  */
-public class AndropodTransceiver extends Thread {
-    private ServerSocket AndropodSocket = null;
-    private Socket AndropodInterface = null;
-    private BufferedInputStream AndropodReader = null;
-    private BufferedOutputStream AndropodWriter = null;
+public class AndropodTransceiver implements Runnable
+{
+
+    public static enum Type
+    {
+        APOD_TELTYPE_DATANACK(1),
+        APOD_TELTYPE_DATA(2),
+        APOD_TELTYPE_ACK(3),
+        APOD_TELTYPE_NACK(4),
+        APOD_TELTYPE_PING(5),
+        APOD_TELTYPE_PINGACK(6),
+        APOD_TELTYPE_FRAGMENT(7);
+
+        private final byte value;
+
+        private Type(final int value)
+        {
+            this.value = (byte)value;
+        }
+    }
+
+    private short sourceAddress = 2;
+    private byte counter = 0;
+
+    private ServerSocket andropodSocket = null;
+    private Socket andropodInterface = null;
+    private BufferedInputStream andropodReader = null;
+    private BufferedOutputStream andropodWriter = null;
+
+    private Thread runner = null;
+
+    @SuppressWarnings("UnusedDeclaration")
+    public short getSourceAddress()
+    {
+        return sourceAddress;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setSourceAddress(final short sourceAddress)
+    {
+        this.sourceAddress = sourceAddress;
+    }
 
     // this code is executed when a routine starts the thread
-    public void run() {
-        while (true) {
-            // as long the ServerSocket (Port 1337) is not closed (from a routine that calls .Suspend(), see below )
-            while (this.IsOpen()) {
-                try {
-                    //wait until a connection is established
-                    this.AndropodInterface = this.AndropodSocket.accept();
+    public void run()
+    {
+        // as long the ServerSocket (Port 1337) is not closed (from a routine that calls .suspendTransceiver(), see below )
+        while (this.isOpen())
+        {
+            try
+            {
+                //wait until a connection is established
+                this.andropodInterface = this.andropodSocket.accept();
 
-                    // we need these objects to receive and transmit data over the ServerSocket
-                    this.AndropodReader = new BufferedInputStream(this.AndropodInterface.getInputStream());
-                    this.AndropodWriter = new BufferedOutputStream(this.AndropodInterface.getOutputStream());
-
-                } catch (Exception e) {
-                }
+                // we need these objects to receive and transmit data over the ServerSocket
+                this.andropodReader = new BufferedInputStream(this.andropodInterface.getInputStream());
+                this.andropodWriter = new BufferedOutputStream(this.andropodInterface.getOutputStream());
             }
-
-            // .Suspend() was called, so ServerSocket has been closed
-            // then close the other objects
-            try {
-                this.AndropodReader.close();
-                this.AndropodWriter.close();
-                this.AndropodInterface.close();
-            } catch (Exception e) {
-            }
-
-            synchronized (this) {
-                try {
-                    // and wait until a notification with "this.notify"
-                    // that means .Resume() was called, see below
-                    this.wait();
-                } catch (Exception e) {
-                }
+            catch (IOException e)
+            {
+                // Shit happens, do someting - later
             }
         }
 
+        // .suspendTransceiver() was called, so ServerSocket has been closed
+        // then close the other objects
+        try
+        {
+            this.andropodReader.close();
+            this.andropodWriter.close();
+            this.andropodInterface.close();
+        }
+        catch (IOException e)
+        {
+            // Ignore
+        }
+
+        runner = null;
+//            synchronized (this) {
+//                try {
+//                    // and wait until a notification with "this.notify"
+//                    // that means .resumeTransceiver() was called, see below
+//                    this.wait();
+//                } catch (InterruptedException e) {
+//                    // Ignore
+//                }
+//        }
+//    }
     }
 
     /**
@@ -63,11 +108,16 @@ public class AndropodTransceiver extends Thread {
      */
     // this routine is called when we stop the Browser-Activity (main-form)= stopping the app
     // or when we go to the settings menue
-    public void Suspend() {
-        try {
+    public void suspendTransceiver()
+    {
+        try
+        {
             // close the ServerSocket(Port 1337)
-            this.AndropodSocket.close();
-        } catch (Exception e) {
+            this.andropodSocket.close();
+        }
+        catch (IOException e)
+        {
+            // Ignore
         }
     }
 
@@ -76,29 +126,43 @@ public class AndropodTransceiver extends Thread {
      */
     // this routine is called when we start the Browser-Activity (main-form)= starting the app
     // or when we resume this activity (after change of settings)
-    public void Resume() {
+    public void resumeTransceiver()
+    {
         // isn't the ServerSocket(Port 1337) still open? just for safety reasons
-        if (!this.IsOpen()) {
-            try {
+        if (!isOpen())
+        {
+            try
+            {
 
                 // new ServerSocket(Port 1337)
-                this.AndropodSocket = new ServerSocket(1337);
+                andropodSocket = new ServerSocket(1337);
 
-                // Thread wasn't started before, this means it is the start of the App
-                if (this.getState() == Thread.State.NEW) {
-
-                    // start the Thread (that means the code in the .run()-routine, see above)
-                    this.start();
-                }
-                // Thread was started before, this means we resumed the main-activity
-                else {
-                    synchronized (this) {
-                        // wake up the Thread (waiting in the .run-routine)
-                        this.notify();
+                synchronized (this)
+                {
+                    if (runner == null)
+                    {
+                        runner = new Thread(this);
+                        runner.start();
                     }
                 }
 
-            } catch (Exception e) {
+//                // Thread wasn't started before, this means it is the start of the App
+//                if (this.getState() == Thread.State.NEW) {
+//
+//                    // start the Thread (that means the code in the .run()-routine, see above)
+//                    this.start();
+//                }
+//                // Thread was started before, this means we resumed the main-activity
+//                else {
+//                    synchronized (this) {
+//                        // wake up the Thread (waiting in the .run-routine)
+//                        this.notify();
+//                    }
+//                }
+
+            }
+            catch (Exception e)
+            {
                 Log.e("info", e.toString());
             }
         }
@@ -110,11 +174,9 @@ public class AndropodTransceiver extends Thread {
      * @return Interface is connected?
      */
     // Connection to ServerSocket (Port 1337) was established
-    public boolean IsConnected() {
-        if (this.AndropodInterface != null && !this.AndropodInterface.isClosed()) {
-            return true;
-        }
-        return false;
+    public boolean isConnected()
+    {
+        return this.andropodInterface != null && !this.andropodInterface.isClosed();
     }
 
     /**
@@ -122,12 +184,10 @@ public class AndropodTransceiver extends Thread {
      *
      * @return Port is open?
      */
-    // ServerSocket (Port 1337) is opened and is still open (was not closed by .Suspend() )
-    public boolean IsOpen() {
-        if (this.AndropodSocket != null && !this.AndropodSocket.isClosed()) {
-            return true;
-        }
-        return false;
+    // ServerSocket (Port 1337) is opened and is still open (was not closed by .suspendTransceiver() )
+    public boolean isOpen()
+    {
+        return this.andropodSocket != null && !this.andropodSocket.isClosed();
     }
 
     /**
@@ -136,42 +196,145 @@ public class AndropodTransceiver extends Thread {
      * @param buffer to be transmitted
      * @param len length to send
      */
-    public void Write(byte[] buffer, int len) {
-        if (this.IsConnected()) {
-            try {
+    @SuppressWarnings("UnusedDeclaration")
+    public void write(byte[] buffer, int len)
+    {
+        if (this.isConnected())
+        {
+            try
+            {
                 // send out 16 bytes of the rawdata buffer of the message object
-                this.AndropodWriter.write(buffer,0,len);
-                this.AndropodWriter.flush();
-            } catch (Exception e) {
+                this.andropodWriter.write(buffer, 0, len);
+                this.andropodWriter.flush();
+            }
+            catch (IOException e)
+            {
+                // Ignore
             }
         }
     }
 
     /**
-     * Receive a packet from the AndropodInterface
-     * Waits until a packet has been received successfully
+     * Receive a packet from the AndropodInterface Waits until a packet has been received successfully
      *
      * @return Received packet
      */
 
-    public synchronized byte Receive() {
+    public synchronized byte read()
+    {
         // a message-object to be filled with data
         // Connection to ServerSocket was established (for safety reasons)
-        byte b=0;
-        if (this.IsConnected()) {
-            try {
-                int c = this.AndropodReader.read();
-                if (c != -1) b=(byte)c;
-            } catch (Exception e) {
-                try {
-                    this.AndropodInterface.close();
-                } catch (Exception e2) {
+        byte b = 0;
+        if (this.isConnected())
+        {
+            try
+            {
+                int c = this.andropodReader.read();
+                if (c != -1)
+                {
+                    b = (byte)c;
                 }
-                this.AndropodInterface = null;
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    this.andropodInterface.close();
+                }
+                catch (Exception e2)
+                {
+                    // Ignore
+                }
+                this.andropodInterface = null;
             }
         }
         return b;
     }
 
+    public void write(final Type type, final short targetAddress, final byte[] bytes) throws IOException
+    {
+        final AndropodTelegram telegram = new AndropodTelegram();
+        telegram.type = type.value;
+        telegram.sourceAddress = sourceAddress;
+        telegram.targetAddress = targetAddress;
+        telegram.counter = counter++;
+        telegram.length = (bytes.length <= AndropodTelegram.ANDROPOD_BUFFER_SIZE) ? (byte)bytes.length
+                : AndropodTelegram.ANDROPOD_BUFFER_SIZE;
+        System.arraycopy(bytes, 0, telegram.data, 0, telegram.length);
+        telegram.computeCheckSum();
+        telegram.writeBytes(andropodWriter);
+    }
 
+    private static class AndropodTelegram
+    {
+        public static final int ANDROPOD_BUFFER_SIZE = 20;
+        private final int HEADER_SIZE = 8;
+
+        byte checkSum;
+        byte type;
+        short sourceAddress;
+        short targetAddress;
+        byte counter;
+        byte length;
+        final byte[] data = new byte[ANDROPOD_BUFFER_SIZE];
+
+        public void computeCheckSum()
+        {
+            byte crc = processByte((byte)0, type);
+            crc = processByte(crc, (byte)(sourceAddress & 0xFF));
+            crc = processByte(crc, (byte)((sourceAddress >> 8) & 0xFF));
+            crc = processByte(crc, (byte)(targetAddress & 0xFF));
+            crc = processByte(crc, (byte)((targetAddress >> 8) & 0xFF));
+            crc = processByte(crc, counter);
+            crc = processByte(crc, length);
+            for (final byte aData : data)
+            {
+                crc = processByte(crc, aData);
+            }
+            checkSum = crc;
+        }
+
+        private byte processByte(byte crc, byte data)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                final boolean feedback = ((crc ^ data) & 0x01) == 1;
+                if (feedback)
+                {
+                    crc ^= 0x18;
+                }
+                crc = (byte)((crc >> 1) & 0x7F);
+                if (feedback)
+                {
+                    crc |= 0x80;
+                }
+                data >>= 1;
+            }
+            return crc;
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void writeBytes(final OutputStream os) throws IOException
+        {
+            final byte[] buffer = new byte[HEADER_SIZE + ANDROPOD_BUFFER_SIZE];
+            buffer[0] = checkSum;
+            buffer[1] = type;
+            buffer[2] = (byte)(sourceAddress & 0xFF);
+            buffer[3] = (byte)((sourceAddress >> 8) & 0xFF);
+            buffer[4] = (byte)(targetAddress & 0xFF);
+            buffer[5] = (byte)((targetAddress >> 8) & 0xFF);
+            buffer[6] = counter;
+            buffer[7] = length;
+            System.arraycopy(data, 0, buffer, HEADER_SIZE, length);
+            os.write(buffer, 0, HEADER_SIZE + length);
+        }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public void readBytes(final InputStream is)
+        {
+            final byte[] buffer = new byte[HEADER_SIZE + ANDROPOD_BUFFER_SIZE];
+            int index = 0;
+            int i = 0;
+        }
+    }
 }
