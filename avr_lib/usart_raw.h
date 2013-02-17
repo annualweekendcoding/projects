@@ -73,8 +73,8 @@ volatile uint8_t usart_tx_buffercounter;
 // Schnittstelle initialisieren
 void usart_init(unsigned long baudrate);
 
-// Schreibt ein einzelnes Zeichen 
-void usart_write(uint8_t b);
+// Schreibt ein einzelnes Zeichen in einen Puffer 
+uint8_t usart_write(uint8_t b);
 
 // Schreibt eine Reihe von Zeichen in einen Puffer
 // liefert 0x80 bei Erfolg

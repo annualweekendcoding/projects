@@ -5,13 +5,15 @@
 
 #define APOD_BUFFER_SIZE 20
 
-#ifndef APOD_MYADDRESS
+// Eigene Adresse 
+// TODO: muss parametrierbar werden
 #define APOD_MYADDRESS 1
-#endif
 
-#ifndef APOD_BROADCAST_ADDRESS
-#define APOD_BROADCAST_ADDRESS 1
-#endif
+// Broadcast-Adresse
+#define APOD_BROADCAST_ADDRESS 255
+
+// Kann für Debug-Zwecke umdefiniert werden
+#define debug_write_Pstr(x)
 
 enum apod_tsend_state 
 {
@@ -42,9 +44,7 @@ enum apod_treceive_state
 {
   receive_sync, // Es wird auf das Sync-Zeichen gewartet und kein Fehler
   receive_idle, // Es wird auf Empfang gewartet und kein Fehler
-  receive_header,  // Es wird der Header empfangen
-  receive_data,  // Es werden die Daten empfangen
-  receive_crc,  // Es wird die CRC empfangen
+  receive_progress,  // Es werden die Daten empfangen
   receive_complete,  // Es wurde ein Telegramm vollständig empfangen
   receive_data  // Es sind Empfangene Daten vorhanden
 };
@@ -55,9 +55,10 @@ enum apod_treceive_error
 {
   receive_none,     // Kein Fehler
   receive_crc,      // Prüfsummenfehler
+  receive_overlen,  // Pufferlänge überschritten
 };
 
-extern enum apod_treceive_error apod_receive_lasterror;
+extern enum apod_treceive_error apod_receive_error;
 
 #define APOD_TELTYPE_DATANACK 1  // nicht zu bestätigenden Datenpaket
 #define APOD_TELTYPE_DATA     2  // zu bestätigenden Datenpaket
@@ -89,18 +90,21 @@ static inline uint8_t apod_ping(uint16_t address)
   return apod_send(address,APOD_TELTYPE_PING,0,0);
 };
 
-typedef struct apod_tel_buffer
+struct apod_tel_buffer
 {
+  uint8_t crc;            // CRC-Prüfsumme über Kopf und Daten
   uint8_t teltype;        // Telegrammtyp (siehe APOD_TELTYPE_* ) oder 0 für Puffer frei
   uint16_t srcaddress;    // Quelladresse
   uint16_t destaddress;   // Zieladresse
   uint8_t telcount;       // Telegrammzähler
   uint8_t len;            // Datenlänge
-  uint8_t crc;            // CRC-Prüfsumme über Kopf und Daten
   uint8_t data[APOD_BUFFER_SIZE]; // Puffer für die Daten
-} extern apod_receive_buffer;
+};
 
-#define APOD_HEADER_SIZE = sizeof(apod_tel_buffer)-APOD_BUFFER_SIZE; // Struktur vor den Daten in obiger Struktur
+extern struct apod_tel_buffer apod_receive_buffer;
+
+// Struktur vor den Daten in obiger Struktur
+#define APOD_HEADER_SIZE (sizeof(apod_receive_buffer)-APOD_BUFFER_SIZE) 
 
 // Freigeben des Empfangspuffers für neue Daten
 void apod_receive_clear(); 
