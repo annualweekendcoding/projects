@@ -8,8 +8,9 @@
 
 #include <stdio.h>
 
-#define BUFFER_SIZE	50
-volatile uint8_t usart_buffercounter;
+#define USART_BUFFER_SIZE	50
+volatile uint8_t usart_rx_buffercounter;
+volatile uint8_t usart_tx_buffercounter;
 
 //----------------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ volatile uint8_t usart_buffercounter;
 #define UDR UDR0
 #define UBRR UBRR0L
 #define USART_RX USART0_RX_vect
+#define USART_TX USART0_TX_vect
 #elif defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__)
 #define USR UCSR0A
 #define UCR UCSR0B
@@ -35,15 +37,18 @@ volatile uint8_t usart_buffercounter;
 #define TXEN TXEN0
 #define RXEN RXEN0
 #define RXCIE RXCIE0
+#define TXCIE TXCIE0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART0_RX_vect
+#define USART_TX USART0_TX_vect
 #elif defined (__AVR_ATmega32__)
 #define USR UCSRA
 #define UCR UCSRB
 #define UBRR UBRRL
 #define EICR EICRB
 #define USART_RX USART_RXC_vect
+#define USART_TX USART_TXC_vect
 #elif defined (__AVR_ATmega8__)
 #define USR UCSRA
 #define UCR UCSRB
@@ -55,9 +60,11 @@ volatile uint8_t usart_buffercounter;
 #define TXEN TXEN0
 #define RXEN RXEN0
 #define RXCIE RXCIE0
+#define TXCIE TXCIE0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART_RX_vect
+#define USART_TX USART_TX_vect
 #else
 #error USART-Library nicht fuer diesen Prozessor parametriert
 #endif
@@ -69,8 +76,12 @@ void usart_init(unsigned long baudrate);
 // Schreibt ein einzelnes Zeichen 
 void usart_write(uint8_t b);
 
-// Schreibt eine Reihe von Zeichen
-void usart_write_buffer(const uint8_t* buffer, uint8_t len);
+// Schreibt eine Reihe von Zeichen in einen Puffer
+// liefert 0x80 bei Erfolg
+uint8_t usart_write_buffer(const uint8_t* buffer, uint8_t len);
+
+// liefert die Restlänge zu sendender Zeichen
+#define usart_write_len() (usart_tx_buffercounter)
 
 // Liest ein einzelnes Zeichen - liefert 0 wenn Puffer leer
 uint8_t usart_read();
@@ -79,7 +90,7 @@ uint8_t usart_read();
 uint8_t usart_read_buffer(uint8_t* buffer, uint8_t maxlen);
 
 // Die aktuelle zu lesende Länge steht im buffercounter
-#define usart_read_len() (usart_buffercounter)
+#define usart_read_len() (usart_rx_buffercounter)
 
 //----------------------------------------------------------------------------
 
