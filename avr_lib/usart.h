@@ -25,6 +25,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 // Benutzung:
 // Datei einbinden: #include "usart.h"
 // Am Anfang von main() usart_init(baudrate); aufrufen
+// sei(); nicht vergessen, wenn etwas empfangen werden soll.
 
 // Die Empfangsroutine arbeitet wie ein Terminal mit Echo
 // Backspace wird ausgewertet

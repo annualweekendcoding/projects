@@ -4,7 +4,7 @@ volatile uint8_t usart_buffercounter = 0;
 
 uint8_t usart_rx_buffer[BUFFER_SIZE];
 uint8_t *usart_rx_buffer_pointer_in	= &usart_rx_buffer[0];
-uint8_t *usart_rx_buffer_pointer_out	= &usart_rx_buffer[0];
+uint8_t *usart_rx_buffer_pointer_out = &usart_rx_buffer[0];
 	
 //----------------------------------------------------------------------------
 //Init serielle Schnittstelle

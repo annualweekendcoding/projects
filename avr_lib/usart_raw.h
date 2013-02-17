@@ -1,6 +1,7 @@
 // Benutzung:
 // Datei einbinden: #include "usart_raw.h"
 // Am Anfang von main() usart_init(baudrate); aufrufen
+// sei(); nicht vergessen, wenn etwas empfangen werden soll.
 
 #ifndef _USART_RAW_H
 #define _USART_RAW_H
