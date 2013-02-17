@@ -1,0 +1,9 @@
+*.o
+*.bak
+*.d
+/Teichroboter/android/out
+/Teichroboter/android/.idea
+/Teichroboter/avr_M168/avr_M168/Debug
+/Teichroboter/android/gen
+
+*.iml
