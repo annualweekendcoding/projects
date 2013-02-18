@@ -7,3 +7,6 @@
 /Teichroboter/android/gen
 
 *.iml
+/Fahrregler/android/out
+/Fahrregler/android/.idea
+/Fahrregler/android/gen
