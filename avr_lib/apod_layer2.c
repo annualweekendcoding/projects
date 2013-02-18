@@ -83,7 +83,7 @@ void apod_send_header(uint16_t address, uint8_t teltype, uint8_t telcount)
 {
   // Senden eines einfachen Telegramms nur Header
   // Nur Senden wenn das Senden im idle ist.
-  if (apod_send_state == send_idle)
+  if (apod_send_state == send_idle || apod_send_state == send_ok)
   {
     apod_send_buffer.teltype = teltype;
     apod_send_buffer.destaddress = address;
@@ -144,29 +144,36 @@ void apod_layer2_tick()
     {
       *apod_receive_buffer_ptr++ = usart_read();
     }
+    else usart_read(); // Bei Überlänge Zeichen verwerfen
 
-    if (apod_receive_len>=APOD_HEADER_SIZE && apod_receive_len-APOD_HEADER_SIZE >= apod_receive_buffer.len)
+    if ((apod_receive_len>=APOD_HEADER_SIZE) && ((apod_receive_len-APOD_HEADER_SIZE) >= apod_receive_buffer.len))
     {
       // Es wurde genau der Header und die entsprechende Datenlänge empfangen
-      if (apod_receive_buffer.len<APOD_BUFFER_SIZE && apod_receive_buffer.crc == crc8(((uint8_t*)&apod_receive_buffer)+1,apod_receive_buffer.len+APOD_HEADER_SIZE-1))
+      if (apod_receive_buffer.len<APOD_BUFFER_SIZE)
       {
-        // Empfang komplett und CRC i.o.
-        apod_receive_state=receive_complete;
-        apod_receive_error=receive_none;
-      }
-      else
-      {
-        // CRC-Fehler oder Überlänge
-        if (apod_receive_buffer.len<APOD_BUFFER_SIZE)
+        uint8_t crc = crc8(((uint8_t*)&apod_receive_buffer)+1,apod_receive_buffer.len+APOD_HEADER_SIZE-1);
+        if (apod_receive_buffer.crc == crc)
         {
-          debug_write_Pstr(PSTR("REC FAIL CRC\r\n"));
-          apod_receive_error=receive_crc;
+          // Empfang komplett und CRC i.o.
+          apod_receive_state=receive_complete;
+          apod_receive_error=receive_none;
         }
         else
         {
-          debug_write_Pstr(PSTR("REC FAIL OVERLEN\r\n"));
-          apod_receive_error=receive_overlen;
+          // CRC-Fehler
+          debug_write_Pstr(PSTR("REC FAIL CRC\r\n"));
+          apod_receive_error=receive_crc;
+          // Empfang melden und mit Fehler bestätigen
+          apod_receive_state = receive_sync;
+          // Antwortpaket zusammenstellen
+          apod_send_header(apod_receive_buffer.srcaddress,APOD_TELTYPE_NACK,apod_receive_buffer.telcount);
+          usart_write(crc);
         }
+      }
+      else
+      {
+        debug_write_Pstr(PSTR("REC FAIL OVERLEN\r\n"));
+        apod_receive_error=receive_overlen;
         // Empfang melden und mit Fehler bestätigen
         apod_receive_state = receive_sync;
         // Antwortpaket zusammenstellen

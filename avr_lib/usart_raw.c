@@ -3,13 +3,13 @@
 volatile uint8_t usart_rx_buffercounter = 0;
 
 uint8_t usart_rx_buffer[USART_BUFFER_SIZE];
-uint8_t *usart_rx_buffer_pointer_in	= &usart_rx_buffer[0];
-uint8_t *usart_rx_buffer_pointer_out = &usart_rx_buffer[0];
+uint8_t *usart_rx_buffer_pointer_in	= usart_rx_buffer;
+uint8_t *usart_rx_buffer_pointer_out = usart_rx_buffer;
 
 volatile uint8_t usart_tx_buffercounter = 0;
 uint8_t usart_tx_buffer[USART_BUFFER_SIZE];
-uint8_t *usart_tx_buffer_pointer_in = &usart_tx_buffer[0];
-uint8_t *usart_tx_buffer_pointer_out = &usart_tx_buffer[0];
+uint8_t *usart_tx_buffer_pointer_in = usart_tx_buffer;
+uint8_t *usart_tx_buffer_pointer_out = usart_tx_buffer;
 
 
 //----------------------------------------------------------------------------
@@ -32,17 +32,24 @@ void usart_init(unsigned long baudrate)
 //Routine für das schreiben eines Bytes
 uint8_t usart_write(uint8_t b)
 {
+		//Warten solange bis Zeichen gesendet wurde
+		while(!(USR & (1<<UDRE)));
+		//Ausgabe des Zeichens
+		UDR = b;
+/*  
   if (usart_tx_buffercounter>=USART_BUFFER_SIZE) return 0; // Puffer ist voll
 
   *usart_tx_buffer_pointer_in++ = b;
   usart_tx_buffercounter++;
   UCR |= (1<<TXCIE); // Sende Interrupt ein
+  USR |= (1<<TXC); // Senden komplett Flag setzen um ISR auszulösen
 
   if (usart_tx_buffer_pointer_in >= usart_tx_buffer+USART_BUFFER_SIZE)
   {
     // Ringpuffer wieder von vorn beginnen
     usart_tx_buffer_pointer_in = usart_tx_buffer;
   }
+*/  
   return 0x80;  
 }
 

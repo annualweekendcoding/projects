@@ -22,6 +22,7 @@ volatile uint8_t usart_tx_buffercounter;
 //----------------------------------------------------------------------------
 
 //Anpassen der seriellen Schnittstellen Register wenn ein ATMega128 benutzt wird
+//TODO: Die Definitionen prüfen, sie scheinen nicht vollständig zu sein
 #if defined (__AVR_ATmega128__)
 #define USR UCSR0A
 #define UCR UCSR0B
@@ -38,6 +39,7 @@ volatile uint8_t usart_tx_buffercounter;
 #define RXEN RXEN0
 #define RXCIE RXCIE0
 #define TXCIE TXCIE0
+#define TXC TXC0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART0_RX_vect
@@ -61,6 +63,7 @@ volatile uint8_t usart_tx_buffercounter;
 #define RXEN RXEN0
 #define RXCIE RXCIE0
 #define TXCIE TXCIE0
+#define TXC TXC0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART_RX_vect
@@ -74,6 +77,7 @@ volatile uint8_t usart_tx_buffercounter;
 void usart_init(unsigned long baudrate);
 
 // Schreibt ein einzelnes Zeichen in einen Puffer 
+// liefert 0x80 bei Erfolg
 uint8_t usart_write(uint8_t b);
 
 // Schreibt eine Reihe von Zeichen in einen Puffer

@@ -3,26 +3,49 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-        >
-    <ScrollView
+              android:gravity="top">
+    <FrameLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView" android:fillViewport="true">
-        <TextView
+            android:layout_height="78dp" android:layout_marginBottom="25dp">
+        <Button
+                android:layout_width="68dp"
+                android:layout_height="wrap_content"
+                android:text="Aus"
+                android:id="@+id/offButton" android:onClick="offButtonClick"
+                android:layout_gravity="center_horizontal|top"/>
+        <Button
+                android:layout_width="86dp"
+                android:layout_height="wrap_content"
+                android:text="Ein"
+                android:id="@+id/onButton" android:longClickable="false" android:onClick="onButtonClick"
+                android:layout_gravity="left|top"/>
+        <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New Text"
-                android:id="@+id/textView"/>
-    </ScrollView>
-    <Button
+                android:text="Flash"
+                android:id="@+id/flashButton" android:layout_gravity="right|bottom"
+                android:onClick="flashButtonClick"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Toggle"
+                android:id="@+id/toggleButton" android:layout_gravity="right|top"
+                android:onClick="toggleButtonClick"/>
+    </FrameLayout>
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Ein"
-            android:id="@+id/onButton" android:longClickable="false" android:onClick="onButtonClick"/>
-    <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Aus"
-            android:id="@+id/offButton" android:onClick="offButtonClick"/>
+            android:layout_height="fill_parent">
+        <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollView" android:fillViewport="false"
+                android:layout_gravity="right|center_vertical">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView"/>
+        </ScrollView>
+    </LinearLayout>
 </LinearLayout>
 

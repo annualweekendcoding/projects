@@ -23,10 +23,17 @@ int main(void)
   //Globale Interrupts einschalten
   sei();
   
+  usart_write_buffer((uint8_t*)"AVR started",11);
+  
   while(1)
   {
     apod_layer2_tick();
-    if (usart_read_len()>0) LED_FLASH(RED);
+    if (usart_read_len()>0) {
+      LED_FLASH(RED);
+      //uint8_t buffer[10];
+      //while (usart_read_len()>0) usart_write(usart_read());
+    }      
+
     if (apod_receive_state==receive_data)
     {
       if (apod_receive_buffer.len==1)
@@ -38,5 +45,6 @@ int main(void)
       }
       apod_receive_clear();
     }
+
   }
 }
