@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="fill_vertical">
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Schneller"
+        android:id="@+id/upButton"
+        android:singleLine="true"
+        android:onClick="onButtonClick" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Langsamer"
+        android:id="@+id/downButton"
+        android:singleLine="true"
+        android:onClick="onButtonClick" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Fahrtrichtungsumkehr"
+        android:id="@+id/directionButton"
+        android:singleLine="true"
+        android:onClick="onButtonClick" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Halt"
+        android:id="@+id/haltButton"
+        android:singleLine="true"
+        android:onClick="onButtonClick" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/logView"
+        android:layout_weight="1"
+        android:gravity="bottom" />
+
+</LinearLayout>
+
