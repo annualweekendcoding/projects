@@ -7,4 +7,7 @@
 /Teichroboter/android/gen
 
 *.iml
+/Fahrregler/android/out
+/Fahrregler/android/.idea
+/Fahrregler/android/gen
 /Teichroboter/avr_butterfly/avr_butterfly/Debug
