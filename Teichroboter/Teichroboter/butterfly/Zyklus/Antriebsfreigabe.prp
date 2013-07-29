@@ -1,0 +1,36 @@
+PRAP {
+V1100 
+"PROC_TYPE"="FUNCTION_BLOCK"
+.Vars {
+"_INIT","BOOL","init","Initialisierungsvariable","16","",0,0,0,1281
+"_Op0","BYTE","","Operation 0 aktiv","0","",0,0,1,259
+"ANLAGE_AUS","BOOL","anlage_aus","Anlage AUS","6","",0,0,0,1
+"AKKU_NIEDRIG","BOOL","akku_niedrig","Akku niedrig","14","",0,0,0,1
+"ANTRIEBSFREIGABE","BOOL","antriebsfreigabe","Antriebsfreigabe erteilt","18","",0,0,0,2
+}
+IniOp: 0
+OpVars {
+"Antriebsfreigabe erteilt","nicht Antriebsfreigabe erteilt"="|ANTRIEBSFREIGABE|||"
+}
+PVars {
+"Anlage AUS","nicht Anlage AUS"="|ANLAGE_AUS|||"
+"Akku niedrig","nicht Akku niedrig"="|AKKU_NIEDRIG|||"
+}
+O {
+(350,90),50,20 ,"",{}
+(350,310),50,20 ,"",{0}
+}
+P {
+(350,170),50,20 ,0
+(350,240),50,20 ,1
+}
+A {
+n(350,210);(350,240)
+(350,130);(350,170)
+y(300,190);(240,190)
+y(300,260);(240,260);(240,190)
+(240,190);(240,110);(300,110)
+n(350,280);(350,310)
+(400,330);(440,330);(440,190);(400,190)
+}
+}

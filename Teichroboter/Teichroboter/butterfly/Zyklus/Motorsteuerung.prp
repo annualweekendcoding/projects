@@ -1,0 +1,128 @@
+PRAP {
+V1100 
+"PROC_TYPE"="FUNCTION_BLOCK"
+.Vars {
+"_INIT","BOOL","init","Initialisierungsvariable","16","",0,0,0,1281
+"_Op0","BYTE","","Operation 0 aktiv","19","",0,0,1,259
+"RECHTS_PWM","INT","rechts_pwm","Geschwindigkeit Motor rechts","1","",0,0,0,18
+"LINKS_PWM","INT","links_pwm","Geschwindigkeit Motor links","2","",0,0,0,18
+"KURS_DIFF","INT","kurs_diff","aktuelle Kursdifferenz zum Kompass","12","",0,0,0,1
+"GESCHWINDIGKEIT","INT","geschwindigkeit","aktuelle Sollgeschwindigkeit","13","",0,0,0,1
+"_P0","BOOL","","Kursdifferenz zu groß","20","",0,0,1,514
+"_P1","BOOL","","Kursdifferenz zu klein","21","",0,0,1,66050
+"Zeit","DINT","","","22","",0,0,1,19
+"TIME_MS","DINT","time_ms","Umlaufzähler in Millisekunden","9","",0,0,0,1
+"_P2","BOOL","","Geschwindigkeit = 0","23","",0,0,1,131586
+"_P3","BOOL","","Drehimpuls abgelaufen","24","",0,0,1,2
+"_P4","BOOL","","","0","",0,0,1,262658
+"_P5","BOOL","","","0","",0,0,1,328194
+"Impulsdauer","INT","","","0","",0,0,1,19
+"_P6","BOOL","","","0","",0,0,1,393730
+"DREHVERSUCHE","INT","drehversuche","Anzahl Drehversuche als Umlaufzähler","25","",0,0,0,19
+}
+IniOp: 0
+OpVars {
+"Zeit merken","nicht Zeit merken"="||ARI|Zeit|TIME_MS"
+"Rechts positiv","nicht Rechts positiv"="||ARI|RECHTS_PWM|100"
+"Links positiv","nicht Links positiv"="||ARI|LINKS_PWM|100"
+"Rechts aus","nicht Rechts aus"="||ARI|RECHTS_PWM|0"
+"Links aus","nicht Links aus"="||ARI|LINKS_PWM|0"
+"Links Geschwindigkeit","nicht Links Geschwindigkeit"="||ARI|LINKS_PWM|GESCHWINDIGKEIT"
+"Rechts Geschwindigkeit","nicht Rechts Geschwindigkeit"="||ARI|RECHTS_PWM|GESCHWINDIGKEIT"
+"Rechts negativ","nicht Rechts negativ"="||ARI|RECHTS_PWM|-120"
+"Links negativ","nicht Links negativ"="||ARI|LINKS_PWM|-120"
+"Impulsdauer berechnen","nicht Impulsdauer berechnen"="||ARI|Impulsdauer|ABS(KURS_DIFF)*5"
+"Drehversuche erhöhen","nicht Drehversuche erhöhen"="||ARI|DREHVERSUCHE|DREHVERSUCHE+1"
+}
+PVars {
+"Kursdifferenz zu groß","nicht Kursdifferenz zu groß"="|_P0|VGL|KURS_DIFF > 150|"
+"Kursdifferenz zu klein","nicht Kursdifferenz zu klein"="|_P1|VGL|KURS_DIFF < -150|"
+"Drehimpuls abgelaufen","nicht Drehimpuls abgelaufen"="|_P3|VGL|(TIME_MS-Zeit)>Impulsdauer|"
+"Geschwindigkeit < 0","nicht Geschwindigkeit < 0"="|_P2|VGL|GESCHWINDIGKEIT<0|"
+"Pausenzeit abgelaufen","nicht Pausenzeit abgelaufen"="|_P5|VGL|(TIME_MS-Zeit)>3000|"
+"Geschwindigkeit > 0","nicht Geschwindigkeit > 0"="|_P4|VGL|GESCHWINDIGKEIT>0|"
+"Kleiner Drehimpuls abgelaufen","nicht Kleiner Drehimpuls abgelaufen"="|_P6|VGL|(TIME_MS-Zeit)>(Impulsdauer/5)|"
+}
+O {
+(270,80),80,40 ,"",{0,3,4,9}
+(570,590),50,20 ,"",{1,8}
+(770,360),50,20 ,"",{8}
+(990,590),50,20 ,"",{2,7}
+(1200,360),50,20 ,"",{7}
+(270,470),80,30 ,"",{5,6,9}
+(570,820),70,20 ,"",{0,10}
+(570,890),50,20 ,"",{3,4}
+(770,590),50,20 ,"",{0,4}
+(1200,590),50,20 ,"",{0,3}
+}
+P {
+(270,180),50,20 ,0
+(270,250),50,20 ,1
+(570,740),70,20 ,2
+(570,960),70,20 ,4
+(990,740),70,20 ,2
+(130,320),50,20 ,5
+(270,320),50,20 ,3
+(990,180),50,20 ,3
+(570,250),50,20 ,3
+(770,510),70,20 ,6
+(1200,510),70,20 ,6
+(1200,440),50,20 ,0
+(990,670),50,20 ,0
+(770,440),50,20 ,1
+(570,670),50,20 ,1
+}
+C {
+(270,30),10,10 ,"0"
+(130,260),10,10 ,"0"
+(570,1030),10,10 ,"0"
+(1080,680),10,10 ,"0"
+(1290,450),10,10 ,"0"
+(860,450),10,10 ,"0"
+(660,680),10,10 ,"0"
+}
+A {
+(270,160);(270,180)
+n(270,290);(270,320)
+n(270,220);(270,250)
+(190,500);(30,500);(30,200);(220,200)
+n(500,760);(470,760);(470,610);(520,610)
+(270,50);(270,80)
+y(570,780);(570,820)
+(570,860);(570,890)
+(570,930);(570,960)
+n(500,980);(460,980);(460,910);(520,910)
+y(570,1000);(570,1030)
+n(920,760);(890,760);(890,610);(940,610)
+y(990,780);(990,840);(640,840)
+y(270,360);(270,420)
+y(130,360);(130,420);(270,420)
+(270,420);(270,470)
+n(220,340);(180,340)
+n(130,320);(130,280)
+y(320,200);(940,200)
+y(320,270);(520,270)
+y(620,270);(770,270);(770,360)
+n(570,290);(570,590)
+n(700,530);(670,530);(670,380);(720,380)
+n(1130,530);(1100,530);(1100,380);(1150,380)
+n(990,220);(990,590)
+y(1040,200);(1200,200);(1200,360)
+y(770,550);(770,590)
+(720,610);(620,610)
+y(1200,550);(1200,590)
+(1150,610);(1040,610)
+(1200,400);(1200,440)
+y(1200,480);(1200,510)
+(990,630);(990,670)
+y(990,710);(990,740)
+n(1040,690);(1070,690)
+n(1250,460);(1280,460)
+(770,400);(770,440)
+y(770,480);(770,510)
+n(820,460);(850,460)
+(570,630);(570,670)
+y(570,710);(570,740)
+n(620,690);(650,690)
+}
+}

@@ -1,0 +1,84 @@
+PRAP {
+V1100 
+"PROC_TYPE"="FUNCTION_BLOCK"
+.Vars {
+"_INIT","BOOL","init","Initialisierungsvariable","16","",0,0,0,1281
+"_Op0","BYTE","","","0","",0,0,1,259
+"ANLAGE_AUS","BOOL","anlage_aus","Anlage AUS","6","",0,0,0,1
+"_P0","BOOL","","","0","",0,0,1,514
+"AKKU_SPANNUNG","INT","akku_spannung","Spannung des Akkus","4","",0,0,0,1
+"Zeit","DINT","","","0","",0,0,1,19
+"TIME_MS","DINT","time_ms","Umlaufzähler in Millisekunden","9","",0,0,0,1
+"PUMPE_EIN","BOOL","pumpe_ein","Pumpe einschalten","3","",0,0,0,2
+"_P1","BOOL","","","0","",0,0,1,66050
+"_P2","BOOL","","","0","",0,0,1,131586
+"_P3","BOOL","","","0","",0,0,1,197122
+"AKKU_NIEDRIG","BOOL","akku_niedrig","Akku niedrig","14","",0,0,0,1
+"KURS","INT","kurs_akt","aktuell gefahrener Kurs","11","",0,0,0,0
+"PUMPE_AUSGEKLAPPT","BOOL","pumpe_ausgeklappt","Pumpe ausgeklappt","5","",0,0,0,1
+"_P4","BOOL","","","0","",0,0,1,262656
+"KOMPASS_GRAD","INT","kompass_grad","Kompass Richtung, 0..3599, -1 bei Fehler","7","",0,0,0,1
+}
+IniOp: 0
+OpVars {
+"Zeit merken","nicht Zeit merken"="||ARI|Zeit|TIME_MS"
+"Pumpe einschalten","nicht Pumpe einschalten"="|PUMPE_EIN|||"
+}
+PVars {
+"Anlage AUS","nicht Anlage AUS"="|ANLAGE_AUS|||"
+"Akkuspannung zu hoch","nicht Akkuspannung zu hoch"="|_P0|VGL|AKKU_SPANNUNG>1420|"
+"Pumpzeit vergangen","nicht Pumpzeit vergangen"="|_P1|VGL|(TIME_MS-Zeit)>3000|"
+"Wartezeit vergangen","nicht Wartezeit vergangen"="|_P2|VGL|(TIME_MS-Zeit)>20000|"
+"Akku niedrig","nicht Akku niedrig"="|AKKU_NIEDRIG|||"
+"Kompass im Pumpbereich","nicht Kompass im Pumpbereich"="|_P3|VGL|KOMPASS_GRAD<1800 AND KOMPASS_GRAD>700|"
+"Pumpe ausgeklappt","nicht Pumpe ausgeklappt"="|PUMPE_AUSGEKLAPPT|||"
+}
+O {
+(280,70),50,20 ,"",{0}
+(550,150),50,20 ,"",{1}
+(550,520),50,20 ,"",{0}
+(550,590),50,20 ,"Warten",{}
+}
+P {
+(280,150),60,20 ,1
+(550,430),50,20 ,2
+(550,660),50,20 ,3
+(280,220),60,20 ,4
+(280,290),50,20 ,0
+(280,430),50,20 ,5
+(550,220),60,20 ,4
+(550,290),50,20 ,0
+(280,360),50,20 ,6
+}
+A {
+(280,110);(280,150)
+y(340,170);(450,170)
+y(550,470);(550,520)
+(550,560);(550,590)
+(550,630);(550,660)
+y(500,680);(150,680);(150,450)
+n(600,680);(660,680);(660,610);(600,610)
+n(280,190);(280,220)
+n(280,260);(280,290)
+y(220,240);(150,240)
+y(230,310);(150,310)
+n(550,260);(550,290)
+(550,190);(550,220)
+n(500,450);(450,450)
+y(610,240);(660,240)
+y(600,310);(660,310);(660,240)
+(660,240);(660,90);(330,90)
+n(550,330);(550,430)
+y(330,450);(450,450)
+(450,450);(450,170)
+(450,170);(500,170)
+n(230,450);(150,450)
+(150,450);(150,380)
+n(280,330);(280,360)
+y(230,380);(150,380)
+(150,380);(150,310)
+(150,310);(150,240)
+(150,240);(150,90);(230,90)
+n(280,400);(280,430)
+}
+}

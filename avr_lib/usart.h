@@ -37,6 +37,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #define _UART_H
 
 #include <stdio.h>
+#include <avr/io.h>
 
 #define USART_ECHO	1
 
@@ -94,7 +95,9 @@ struct {
 #define USR UCSRA
 #define UCR UCSRB
 #define UBRR UBRRL
-#elif defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega168__)
+#define USART_RX USART_RX_vect
+#elif defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega168__) \
+   || defined (__AVR_ATmega169__) || defined (__AVR_ATmega169P__)
 #define USR UCSR0A
 #define UCR UCSR0B
 #define UBRR UBRR0L
