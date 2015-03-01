@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+import serial
+import modbus
+import time
+
+#Main Program
+#Serial Port 9600,8,N,1
+#Serial Open
+try:
+        ser = serial.Serial(
+                port = '/dev/ttyAMA0',
+                baudrate = 9600,
+                bytesize = serial.EIGHTBITS,
+                parity = serial.PARITY_NONE,
+                stopbits = serial.STOPBITS_ONE,
+                timeout = 0.2
+        )
+except Exception, e:
+        raise ValueError(e)
+
+client = modbus.ModbusRtuClient(ser)
+print "START"
+lasttime = 0
+while 1:       
+    #Read of Registers
+    registers = client.read_holding_registers(11,0,2) #slave,start,number of registers
+    if len(registers)>0:
+        #for i in range(0, len(registers)):
+        #    print "Read of Registers" + str(i) + " = " + str(registers[i])
+        print time. " : " + str(registers[1]-lasttime)
+        lasttime = registers[1]
+
+
+        totalvalue=1
+        val = [0 for i in range(totalvalue)]
+        # Register 0 negiert wieder ausgeben
+        val[0] = not registers[0];
+        #Write of Registers
+        WriteValid = client.preset_multiple_registers(11,0,val) #slave,start,array value
+        #if WriteValid:
+            #for i in range(0, len(val)):
+            #    print "Write of Registers" + str(i) + " = " + str(val[i])
+
+            #print "#################################"
+	
