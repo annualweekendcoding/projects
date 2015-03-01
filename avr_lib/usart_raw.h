@@ -19,7 +19,9 @@ volatile uint8_t usart_tx_buffercounter;
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <avr/io.h>
-
+#ifdef USART_SAVE_LASTTIME
+#include "timer.h"
+#endif
 //----------------------------------------------------------------------------
 
 //Anpassen der seriellen Schnittstellen Register wenn ein ATMega128 benutzt wird
@@ -111,6 +113,8 @@ uint8_t usart_read_buffer(uint8_t* buffer, uint8_t maxlen);
 #if USART_RX_BUFFER_SIZE>0
   // mit Puffer wird die Anzahl der Zeichen im Puffer zurückgeliefert
   #define usart_read_len() (usart_rx_buffercounter)
+  // Zeiger auf den Puffer zur Verfügung stellen
+  extern volatile uint8_t usart_rx_buffer[USART_RX_BUFFER_SIZE];
 #else
   // ohne Puffer wird 1 zurückgeliefert, wenn ein Zeichen im Register ist, sonst 0
   #define usart_read_len() ((USR & (1 << RXC))?1:0)

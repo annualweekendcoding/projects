@@ -22,7 +22,18 @@ int main(void)
 
   //Globale Interrupts einschalten
   sei();
-  
+  uint8_t modbus_crc_errors_saved=modbus_crc_errors;
+  LED_FLASH(GREEN);
+  while (1) 
+  {
+    modbus_words[1] = time_ms;
+    modbus_cycle();
+    if (modbus_words[0]) LED_ON(GREEN); else LED_OFF(GREEN);
+    if (modbus_crc_errors!=modbus_crc_errors_saved) LED_FLASH(RED);
+    modbus_crc_errors_saved=modbus_crc_errors;
+  }
+      
+/*
   usart_write_str("AVR started\r\n");
   
   while(1)
@@ -42,4 +53,5 @@ int main(void)
       _delay_ms(1000);
     }    
   }
+*/  
 }

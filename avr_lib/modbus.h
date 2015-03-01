@@ -20,10 +20,7 @@
 #define OFF 0
 #endif
 
-#define	MaxActionBytes		((uint8_t)(MAX_BitAddresses / 8) + ((MAX_BitAddresses % 8)?1:0))
-
-#define getByteForSysBit(a) ((uint8_t)(a / 8))
-#define getBitForSysBit(a) ((uint8_t)(a % 8))
+#define	MODBUS_MAX_BYTES		((uint8_t)(MODBUS_MAX_BITADDRESSES / 8) + ((MODBUS_MAX_BITADDRESSES % 8)?1:0))
 
 
 /* Slave index */
@@ -68,7 +65,7 @@
 
 #define SELECT_TIMEOUT          -0x13
 #define SELECT_FAILURE          -0x14
-#define NOT_FOR_US	        	-0x15
+#define NOT_FOR_US	        	  -0x15
 #define CONNECTION_CLOSED       -0x16
 #define MB_EXCEPTION            -0x17
 
@@ -86,11 +83,10 @@
  *  - RS232 / RS485 ADU = 253 bytes + slave (1 byte) + CRC (2 bytes) = 256 bytes
  *  - TCP MODBUS ADU = 253 bytes + MBAP (7 bytes) = 260 bytes
  */
-#define MAX_PDU_LENGTH            253
-#define MAX_ADU_LENGTH_RTU        256
-
-/* Kept for compatibility reasons (deprecated) */
-#define MAX_MESSAGE_LENGTH        260
+// Das Telegramm kann nicht größer sein, als der zur Verfügung stehende Sendepuffer
+// Da das maximal 254 Byte sind, wird hier direkt die Puffergröße übernommen
+#define MAX_ADU_LENGTH_RTU        USART_TX_BUFFER_SIZE
+#define MAX_PDU_LENGTH            MAX_ADU_LENGTH_RTU-3
 
 #define EXCEPTION_RESPONSE_LENGTH_RTU  5
 
@@ -102,17 +98,15 @@ typedef struct {
 	uint8_t		cVal;
 } tMBChangedBit ;
 
+// CRC-Fehlerzähler zur Ermittlung der Signalqualität
+extern uint8_t modbus_crc_errors;
 
-//int errorInFrame(uint8_t *frame, uint8_t frameLength);
-//int respondFrame(uint8_t *frame, uint8_t frameLength);
-// void modbus_slave_manage(const uint8_t *query, int query_length);
-
-void modbus_processSlaveFrame(uint8_t *query, int query_length);
-uint8_t getBitCutOut(uint8_t startBit, uint8_t noB, uint8_t *stab, uint8_t *dtab );
+// Diese Funktion vom Zyklus aus aufrufen
+void modbus_cycle();
 
 // hier sind die Modbus-Register die vom Master gelesen und geschrieben werden
-extern volatile uint16_t actProfileData[MAX_WordAddress];
-extern volatile uint8_t systemBits[MaxActionBytes];
+extern volatile uint16_t modbus_words[MODBUS_MAX_WORDADDRESSES];
+extern volatile uint8_t modbus_bytes[MODBUS_MAX_BYTES];
 
 #endif
 

@@ -3,11 +3,11 @@
 
 // Puffergröße für Empfangspuffer
 // 0 = keinen Puffer verwenden sondern direkt empfangen
-#define USART_RX_BUFFER_SIZE	250
+#define USART_RX_BUFFER_SIZE	100
 
 // Puffergröße für Sendepuffer
 // 0 = keinen Puffer verwenden sondern direkt senden
-#define USART_TX_BUFFER_SIZE	250
+#define USART_TX_BUFFER_SIZE	100
 
 // Zeitmessung
 // Wenn definiert, dann die Zeit des letzen Empfangs merken

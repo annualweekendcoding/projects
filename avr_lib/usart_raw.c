@@ -2,16 +2,16 @@
 
 #if USART_RX_BUFFER_SIZE>0 
 volatile uint8_t usart_rx_buffercounter = 0;
-uint8_t usart_rx_buffer[USART_RX_BUFFER_SIZE];
-uint8_t *usart_rx_buffer_pointer_in	= usart_rx_buffer;
-uint8_t *usart_rx_buffer_pointer_out = usart_rx_buffer;
+volatile uint8_t usart_rx_buffer[USART_RX_BUFFER_SIZE];
+volatile uint8_t *usart_rx_buffer_pointer_in	= usart_rx_buffer;
+volatile uint8_t *usart_rx_buffer_pointer_out = usart_rx_buffer;
 #endif
 
 #if USART_TX_BUFFER_SIZE>0
 volatile uint8_t usart_tx_buffercounter = 0;
-uint8_t usart_tx_buffer[USART_TX_BUFFER_SIZE];
-uint8_t *usart_tx_buffer_pointer_in = usart_tx_buffer;
-uint8_t *usart_tx_buffer_pointer_out = usart_tx_buffer;
+volatile uint8_t usart_tx_buffer[USART_TX_BUFFER_SIZE];
+volatile uint8_t *usart_tx_buffer_pointer_in = usart_tx_buffer;
+volatile uint8_t *usart_tx_buffer_pointer_out = usart_tx_buffer;
 #endif
 
 #ifdef USART_SAVE_LASTTIME

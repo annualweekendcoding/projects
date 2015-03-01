@@ -6,6 +6,8 @@
 #include "usart_raw.h"
 
 //#define ActTEMP(a) (uint16_t((5000UL * a) / 1024))
+#define getByteForSysBit(a) ((uint8_t)(a / 8))
+#define getBitForSysBit(a) ((uint8_t)(a % 8))
 
 /* This structure reduces the number of params in functions and so
  * optimizes the speed of execution (~ 37%). */
@@ -18,12 +20,13 @@ typedef struct {
 	int t_id;
 } sft_t;
 
-volatile uint16_t actProfileData[MAX_WordAddress];
-volatile uint8_t  systemBits[MaxActionBytes];
+volatile uint16_t modbus_words[MODBUS_MAX_WORDADDRESSES];
+volatile uint8_t  modbus_bytes[MODBUS_MAX_BYTES];
 tMBChangedBit changedBit;
+uint8_t modbus_crc_errors;
 
 /* Table of CRC values for high-order byte */
-static uint8_t table_crc_hi[] = { 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
+static const PROGMEM uint8_t table_crc_hi[] = { 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
 		0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
 		0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
 		0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81,
@@ -47,7 +50,7 @@ static uint8_t table_crc_hi[] = { 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
 		0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40 };
 
 /* Table of CRC values for low-order byte */
-static uint8_t table_crc_lo[] = { 0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02,
+static const PROGMEM uint8_t table_crc_lo[] = { 0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02,
 		0xC2, 0xC6, 0x06, 0x07, 0xC7, 0x05, 0xC5, 0xC4, 0x04, 0xCC, 0x0C, 0x0D,
 		0xCD, 0x0F, 0xCF, 0xCE, 0x0E, 0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09, 0x08,
 		0xC8, 0xD8, 0x18, 0x19, 0xD9, 0x1B, 0xDB, 0xDA, 0x1A, 0x1E, 0xDE, 0xDF,
@@ -79,8 +82,8 @@ static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length) {
 	//pass through message buffer
 	while (buffer_length--) {
 		i = crc_hi ^ *buffer++; /* calculate the CRC  */
-		crc_hi = crc_lo ^ table_crc_hi[i];
-		crc_lo = table_crc_lo[i];
+		crc_hi = crc_lo ^ pgm_read_byte(&(table_crc_hi[i]));
+		crc_lo = pgm_read_byte(&(table_crc_lo[i]));
 	}
 
 	return (crc_hi << 8 | crc_lo);
@@ -103,7 +106,6 @@ static int check_crc16(uint8_t *msg, const int msg_length) {
 	}
 	return ret;
 }
-
 
 /* Sends a query/response over a serial communication */
 static int modbus_send(uint8_t *query, int query_length) {
@@ -150,30 +152,30 @@ int errorInFrame(uint8_t *frame, uint8_t frameLength) {
 		return INVALID_CRC;
 	}
 
-	if ((frame[0] != SLAVE_ID) && (frame[0] != MODBUS_BROADCAST_ADDRESS)) {
+	if ((frame[0] != MODBUS_SLAVE_ID) && (frame[0] != MODBUS_BROADCAST_ADDRESS)) {
 		return NOT_FOR_US;
 	}
 
 	switch (frame[1]) { // check function code and requested addresses	case
 	case FC_FORCE_SINGLE_COIL:
 	case FC_READ_COIL_STATUS:
-		if ((frame[2] > MAX_BitAddresses) || (frame[2] > MAX_BitAddresses)) {
+		if ((frame[2] > MODBUS_MAX_BITADDRESSES) || (frame[2] > MODBUS_MAX_BITADDRESSES)) {
 			frameHasError = ILLEGAL_DATA_ADDRESS;
 		}
 		break;
 	case FC_READ_INPUT_STATUS:
-		if ((frame[2] > MAX_BitAddresses) || (frame[2] > MAX_BitAddresses)) {
+		if ((frame[2] > MODBUS_MAX_BITADDRESSES) || (frame[2] > MODBUS_MAX_BITADDRESSES)) {
 			frameHasError = ILLEGAL_DATA_ADDRESS;
 		}
 		break;
 	case FC_READ_HOLDING_REGISTERS:
-		if ((frame[3] > MAX_WordAddress) || (frame[2] > MAX_WordAddress)) {
+		if ((frame[3] > MODBUS_MAX_WORDADDRESSES) || (frame[2] > MODBUS_MAX_WORDADDRESSES)) {
 			frameHasError = ILLEGAL_DATA_ADDRESS;
 		}
 		break;
 	case FC_PRESET_SINGLE_REGISTER:
 	case FC_READ_INPUT_REGISTERS:
-		if ((frame[3] > MAX_WordAddress) || (frame[2] > MAX_WordAddress)) {
+		if ((frame[3] > MODBUS_MAX_WORDADDRESSES) || (frame[2] > MODBUS_MAX_WORDADDRESSES)) {
 			frameHasError = ILLEGAL_DATA_ADDRESS;
 		}
 
@@ -191,7 +193,6 @@ int errorInFrame(uint8_t *frame, uint8_t frameLength) {
 	}
 	return frameHasError;
 }
-
 
 static int response_io_status(sft_t *sft, uint8_t *stab,
 								uint8_t *response, int offset) {
@@ -226,26 +227,28 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 	int resp_length = 0;
 	int data, i;
 	sft_t sft;
-	uint8_t response[MAX_MESSAGE_LENGTH];
+	uint8_t response[MAX_ADU_LENGTH_RTU];
 
 	sft.slave = query[offset - 1];
 	sft.function = query[offset];
 	sft.address = (query[offset + 1] << 8) + query[offset + 2];
 
-	if (sft.slave != SLAVE_ID && sft.slave != MODBUS_BROADCAST_ADDRESS) {
+	if (sft.slave != MODBUS_SLAVE_ID && sft.slave != MODBUS_BROADCAST_ADDRESS) 
+  {
 		// Ignores the query (not for me)
 		return;
 	}
 
 	query_length -= CHECKSUM_LENGTH_RTU;
 
-	switch (sft.function) {
+	switch (sft.function) 
+  {
 
 	case FC_READ_COIL_STATUS:
 
 		sft.nb = (query[offset + 3] << 8) + query[offset + 4];
 
-		if ((sft.address / 8 + ((sft.nb)?1:0)) > MAX_BitAddresses) {
+		if ((sft.address / 8 + ((sft.nb)?1:0)) > MODBUS_MAX_BITADDRESSES) {
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,response);
 		} else {
 			resp_length = build_response_basis_rtu(&sft, response);
@@ -255,7 +258,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 			resp_length = response_io_status(
 					&sft,
-					((uint8_t*)systemBits),
+					((uint8_t*)modbus_bytes),
 					response,
 					resp_length);
 		}
@@ -264,7 +267,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 	case FC_READ_INPUT_STATUS:
 		sft.nb = (query[offset + 3] << 8) + query[offset + 4];
 
-		if ((sft.address / 8 + ((sft.nb)?1:0)) > MAX_BitAddresses) {
+		if ((sft.address / 8 + ((sft.nb)?1:0)) > MODBUS_MAX_BITADDRESSES) {
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,response);
 		} else {
 			resp_length = build_response_basis_rtu(&sft, response);
@@ -274,7 +277,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 			resp_length = response_io_status(
 						&sft,
-						((uint8_t*)systemBits),
+						((uint8_t*)modbus_bytes),
 						response,
 						resp_length);
 
@@ -285,20 +288,20 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 		sft.nb = (query[offset + 3] << 8) + query[offset + 4];
 
-		if ((sft.address + sft.nb) >= MAX_WordAddress) {
+		if ((sft.address + sft.nb) >= MODBUS_MAX_WORDADDRESSES) {
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,response);
 		} else {
 			resp_length = build_response_basis_rtu(&sft, response);
 			response[resp_length++] = sft.nb << 1;
 			for (i = (sft.address); i < (sft.address) + sft.nb; i++) {
-				response[resp_length++] = actProfileData[i] >> 8;
-				response[resp_length++] = actProfileData[i] & 0xFF;
+				response[resp_length++] = modbus_words[i] >> 8;
+				response[resp_length++] = modbus_words[i] & 0xFF;
 			}
 		}
 		break;
 	case FC_READ_INPUT_REGISTERS:
 		sft.nb = (query[offset + 3] << 8) + query[offset + 4];
-		if ((sft.address + sft.nb) > MAX_WordAddress) {
+		if ((sft.address + sft.nb) > MODBUS_MAX_WORDADDRESSES) {
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,response);
 		} else {
 			resp_length = build_response_basis_rtu(&sft, response);
@@ -307,7 +310,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 		break;
 	case FC_FORCE_SINGLE_COIL:
 		data = (query[offset + 3] << 8) + query[offset + 4];
-		if (sft.address > MAX_BitAddresses) {
+		if (sft.address > MODBUS_MAX_BITADDRESSES) {
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,
 					response);
 		} else {
@@ -317,10 +320,10 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 				if (data) {
 					changedBit.cVal = TRUE;
-					((uint8_t*)systemBits)[(uint8_t)(sft.address / 8)] |= (1 << (sft.address % 8));
+					((uint8_t*)modbus_bytes)[(uint8_t)(sft.address / 8)] |= (1 << (sft.address % 8));
 				} else {
 					changedBit.cVal = FALSE;
-					((uint8_t*)systemBits)[(uint8_t)(sft.address / 8)] &= ~(1 << (sft.address % 8));
+					((uint8_t*)modbus_bytes)[(uint8_t)(sft.address / 8)] &= ~(1 << (sft.address % 8));
 				}
 
 				// In RTU mode, the CRC is computed and added
@@ -340,14 +343,14 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 		data = (query[offset + 3] << 8) + query[offset + 4];
 
-		if (sft.address >= MAX_WordAddress) {
+		if (sft.address >= MODBUS_MAX_WORDADDRESSES) {
 
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,
 					response);
 		} else {
 
-			if ((sft.address < MAX_WordAddress)){
-				actProfileData[sft.address] = data;
+			if ((sft.address < MODBUS_MAX_WORDADDRESSES)){
+				modbus_words[sft.address] = data;
 				break;
 			}
 
@@ -364,7 +367,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 		sft.nb = (query[offset + 3] << 8) + query[offset + 4];
 
-		if ((sft.address + sft.nb) > MAX_WordAddress) {
+		if ((sft.address + sft.nb) > MODBUS_MAX_WORDADDRESSES) {
 
 			resp_length = response_exception(&sft, ILLEGAL_DATA_ADDRESS,
 					response);
@@ -373,8 +376,7 @@ void modbus_slave_manage(const uint8_t *query, int query_length) {
 
 			for (i = sft.address, j = 6; i < sft.address + sft.nb; i++, j += 2) {
 				// 6 and 7 = first value
-				// FIXME give him the right arrays here
-//				holdingRegs[i] = (query[offset + j] << 8) + query[offset + j + 1];
+				modbus_words[i] = (query[offset + j] << 8) + query[offset + j + 1];
 			}
 
 			resp_length = build_response_basis_rtu(&sft, response);
@@ -399,5 +401,17 @@ void modbus_processSlaveFrame(uint8_t *query, int query_length)
   {
 		modbus_slave_manage(query, query_length);
 	}
+  else modbus_crc_errors++;
 }
 
+void modbus_cycle()
+{
+  // Wenn nichts mehr zu senden und etwas im Empfangspuffer ist und eine Pause von min 3ms entstanden ist
+  // dann Telegramm auswerten
+  if (usart_write_len()==0 && usart_read_len()>0 && usart_rx_getdelay()>2)
+  { 
+    modbus_processSlaveFrame(usart_rx_buffer, usart_read_len());
+    // nach der Auswertung Puffer rücksetzen, damit vom Anfang an neu gelesen wird
+	  usart_flush();  
+  }  
+}
