@@ -1,4 +1,5 @@
 // Benutzung:
+// usart_raw_config.template in das Projekt als usart_raw_config.h kopieren
 // Datei einbinden: #include "usart_raw.h"
 // Am Anfang von main() usart_init(baudrate); aufrufen
 // sei(); nicht vergessen, wenn etwas empfangen werden soll.
@@ -7,8 +8,8 @@
 #define _USART_RAW_H
 
 #include <stdio.h>
+#include "usart_raw_config.h"
 
-#define USART_BUFFER_SIZE	50
 volatile uint8_t usart_rx_buffercounter;
 volatile uint8_t usart_tx_buffercounter;
 
@@ -40,6 +41,7 @@ volatile uint8_t usart_tx_buffercounter;
 #define RXCIE RXCIE0
 #define TXCIE TXCIE0
 #define TXC TXC0
+#define RXC RXC0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART0_RX_vect
@@ -64,6 +66,7 @@ volatile uint8_t usart_tx_buffercounter;
 #define RXCIE RXCIE0
 #define TXCIE TXCIE0
 #define TXC TXC0
+#define RXC RXC0
 #define UDR UDR0
 #define UDRE UDRE0
 #define USART_RX USART_RX_vect
@@ -76,26 +79,48 @@ volatile uint8_t usart_tx_buffercounter;
 // Schnittstelle initialisieren
 void usart_init(unsigned long baudrate);
 
-// Schreibt ein einzelnes Zeichen in einen Puffer 
+// Schreibt ein einzelnes Zeichen  
 // liefert 0x80 bei Erfolg
 uint8_t usart_write(uint8_t b);
 
-// Schreibt eine Reihe von Zeichen in einen Puffer
-// liefert 0x80 bei Erfolg
+// Schreibt eine Reihe von Zeichen
+// liefert 0 bei Erfolg und die Anzahl von Restzeichen die nicht gesendet werden konnten
 uint8_t usart_write_buffer(const uint8_t* buffer, uint8_t len);
 
-// liefert die Restlänge zu sendender Zeichen
-#define usart_write_len() (usart_tx_buffercounter)
+// Schreibt eine Reihe von Zeichen aus dem Programmspeicher
+// liefert 0 bei Erfolg und die Anzahl von Restzeichen die nicht gesendet werden konnten
+uint8_t usart_write_buffer_p(const uint8_t *buffer, uint8_t len);
+
+#if USART_RX_BUFFER_SIZE>0
+  // liefert die Restlänge zu sendender Zeichen
+  #define usart_write_len() (usart_tx_buffercounter)
+#else
+  // ohne Puffer wird 1 geliefert, wenn das letzte Zeichen noch nicht gesendet ist, sonst 0
+  #define usart_write_len() ((USR & (1<<UDRE))?1:0)
+#endif
 
 // Liest ein einzelnes Zeichen - liefert 0 wenn Puffer leer
 uint8_t usart_read();
 
+// Leert den Empfangspuffer
+void usart_flush();
+
 // Liest in einen Puffer - liefert die gelesende Länge
 uint8_t usart_read_buffer(uint8_t* buffer, uint8_t maxlen);
 
-// Die aktuelle zu lesende Länge steht im buffercounter
-#define usart_read_len() (usart_rx_buffercounter)
+#if USART_RX_BUFFER_SIZE>0
+  // mit Puffer wird die Anzahl der Zeichen im Puffer zurückgeliefert
+  #define usart_read_len() (usart_rx_buffercounter)
+#else
+  // ohne Puffer wird 1 zurückgeliefert, wenn ein Zeichen im Register ist, sonst 0
+  #define usart_read_len() ((USR & (1 << RXC))?1:0)
+#endif
+
+#ifdef USART_SAVE_LASTTIME
+  extern volatile uint16_t usart_rx_lasttime;
+  // liefert die Zeitverzögerung seit dem letzten Empfang
+  #define usart_rx_getdelay() (time_ms-usart_rx_lasttime)
+#endif
 
 //----------------------------------------------------------------------------
-
 #endif //_USART_RAW_H
