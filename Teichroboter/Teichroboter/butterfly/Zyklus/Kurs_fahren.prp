@@ -1,0 +1,269 @@
+PRAP {
+V1100 
+"PROC_TYPE"="FUNCTION_BLOCK"
+.Vars {
+"_INIT","BOOL","init","Initialisierungsvariable","16","",0,0,0,1281
+"_Op0","BYTE","","","0","",0,0,1,259
+"ANLAGE_AUS","BOOL","anlage_aus","Anlage AUS","6","",0,0,0,1
+"KURS","INT","kurs_akt","aktuell gefahrener Kurs","11","",0,0,0,18
+"KOMPASS_GRAD","INT","kompass_grad","Kompass Richtung, 0..3599, -1 bei Fehler","7","",0,0,0,1
+"_P0","BOOL","","","0","",0,0,1,514
+"KURS_DIFF","INT","kurs_diff","aktuelle Kursdifferenz zum Kompass","12","",0,0,0,1
+"_P1","BOOL","","","0","",0,0,1,66050
+"Zeit","DINT","","","0","",0,0,1,19
+"TIME_MS","DINT","time_ms","Umlaufzähler in Millisekunden","9","",0,0,0,1
+"GESCHWINDIGKEIT","INT","geschwindigkeit","aktuelle Sollgeschwindigkeit","13","",0,0,0,18
+"PUMPE_AUSGEKLAPPT","BOOL","pumpe_ausgeklappt","Pumpe ausgeklappt","5","",0,0,0,1
+"_P2","BOOL","","","0","",0,0,1,131586
+"AKKU_NIEDRIG","BOOL","akku_niedrig","Akku niedrig","14","",0,0,0,1
+"_P3","BOOL","","","0","",0,0,1,197122
+"_P4","BOOL","","","0","",0,0,1,262658
+"_P5","BOOL","","","0","",0,0,1,328194
+"STATUSTEXTNR","BYTE","statustextnr","Nummer des Textes für die Anzeige am Display","15","",0,0,0,18
+"Fahrzeit","DINT","","","0","",0,0,1,19
+"_P6","BOOL","","","0","",0,0,1,393730
+"ANTRIEBSFREIGABE","BOOL","antriebsfreigabe","Antriebsfreigabe erteilt","18","",0,0,0,1
+"DREHVERSUCHE","INT","drehversuche","Anzahl Drehversuche als Umlaufzähler","25","",0,0,0,1
+"Drehversuche_merk","INT","","","0","",0,0,1,19
+}
+IniOp: 12
+OpVars {
+"Kurs nach hinten","nicht Kurs nach hinten"="||ARI|KURS|2800"
+"Geschwindigkeit = vorwärts","nicht Geschwindigkeit = vorwärts"="||ARI|GESCHWINDIGKEIT|100"
+"Zeit merken","nicht Zeit merken"="||ARI|Zeit|TIME_MS"
+"Geschwindigkeit=0","nicht Geschwindigkeit=0"="||ARI|GESCHWINDIGKEIT|0"
+"Kurs nach vorn","nicht Kurs nach vorn"="||ARI|KURS|1300"
+"Geschwindigkeit = rückwärts","nicht Geschwindigkeit = rückwärts"="||ARI|GESCHWINDIGKEIT|-100"
+"Statustext AUS","nicht Statustext AUS"="||ARI|STATUSTEXTNR|1"
+"Statustext DRHINT","nicht Statustext DRHINT"="||ARI|STATUSTEXTNR|2"
+"Statustext FAHINT","nicht Statustext FAHINT"="||ARI|STATUSTEXTNR|3"
+"Statustext DRVORN","nicht Statustext DRVORN"="||ARI|STATUSTEXTNR|4"
+"Statustext FAVORN","nicht Statustext FAVORN"="||ARI|STATUSTEXTNR|5"
+"Statustext DRSTOE","nicht Statustext DRSTOE"="||ARI|STATUSTEXTNR|6"
+"Fahrzeit merken","nicht Fahrzeit merken"="||ARI|Fahrzeit|TIME_MS"
+"Kurs = Kompass","nicht Kurs = Kompass"="||ARI|KURS|KOMPASS_GRAD"
+"Drehversuche merken","nicht Drehversuche merken"="||ARI|Drehversuche_merk|DREHVERSUCHE"
+}
+PVars {
+"Anlage AUS","nicht Anlage AUS"="|ANLAGE_AUS|||"
+"Kursdifferenz positiv","nicht Kursdifferenz positiv"="|_P0|VGL|KURS_DIFF>10|"
+"Kursdifferenz negativ","nicht Kursdifferenz negativ"="|_P1|VGL|KURS_DIFF<-10|"
+"Pumpe ausgeklappt","nicht Pumpe ausgeklappt"="|PUMPE_AUSGEKLAPPT|||"
+"Rückwärtsfahrzeit abgelaufen","nicht Rückwärtsfahrzeit abgelaufen"="|_P2|VGL|(TIME_MS-Zeit)>2000|"
+"Akku niedrig","nicht Akku niedrig"="|AKKU_NIEDRIG|||"
+"maximale Drehversuche abgelaufen","nicht maximale Drehversuche abgelaufen"="|_P3|VGL|(DREHVERSUCHE-Drehversuche_merk)>3|"
+"Kurs im Sollbereich","nicht Kurs im Sollbereich"="|_P4|VGL|ABS(KURS_DIFF)<150|"
+"Störwartezeit abgelaufen","nicht Störwartezeit abgelaufen"="|_P5|VGL|(TIME_MS-Zeit)>60000|"
+"Fahrzeit zu lange","nicht Fahrzeit zu lange"="|_P6|VGL|(TIME_MS-Fahrzeit)>120000|"
+"Antriebsfreigabe erteilt","nicht Antriebsfreigabe erteilt"="|ANTRIEBSFREIGABE|||"
+}
+O {
+(330,150),90,40 ,"",{2,7,13,14}
+(330,310),90,20 ,"",{5}
+(330,510),70,20 ,"",{3,0}
+(330,940),70,20 ,"",{14}
+(330,1010),90,20 ,"",{5}
+(830,310),100,40 ,"",{1,2,0,8}
+(1370,190),90,40 ,"",{9,13,14,2}
+(1370,360),90,20 ,"",{5}
+(1370,560),70,20 ,"",{3,4}
+(1370,990),70,20 ,"",{14}
+(1370,1060),90,20 ,"",{5}
+(1800,230),100,40 ,"",{1,2,4,10}
+(2350,740),80,40 ,"",{3,2,13,6,12}
+(1370,100),50,20 ,"",{12}
+(330,60),50,20 ,"",{12}
+(830,890),90,30 ,"",{2,3,13}
+(830,980),50,20 ,"",{}
+(1800,800),90,30 ,"",{2,3,13}
+(1800,890),50,20 ,"",{}
+}
+P {
+(830,640),50,20 ,3
+(1800,560),50,20 ,3
+(330,580),50,20 ,10
+(330,860),70,20 ,6
+(330,790),50,20 ,7
+(330,1290),70,20 ,6
+(330,1220),50,20 ,7
+(1370,910),70,20 ,6
+(1370,840),50,20 ,7
+(1370,1340),70,20 ,6
+(1370,1270),50,20 ,7
+(830,500),50,20 ,9
+(1800,420),50,20 ,9
+(1370,420),70,20 ,4
+(330,370),70,20 ,4
+(330,1080),50,20 ,10
+(830,430),50,20 ,10
+(1370,630),50,20 ,10
+(1370,1130),50,20 ,10
+(1800,350),50,20 ,10
+(2350,850),50,20 ,10
+(830,570),50,20 ,7
+(1800,490),50,20 ,7
+(330,720),50,20 ,9
+(330,1150),50,20 ,9
+(1370,770),50,20 ,9
+(1370,1200),50,20 ,9
+(830,1050),70,20 ,4
+(330,440),50,20 ,3
+(1370,490),50,20 ,3
+(1800,960),70,20 ,4
+(1370,700),50,20 ,3
+(330,650),50,20 ,3
+(330,250),50,20 ,3
+(1370,290),50,20 ,3
+}
+C {
+(1170,210),60,20 ,"Drehen nach vorn"
+(430,590),10,10 ,"0"
+(830,720),60,20 ,"Drehen nach vorn"
+(480,790),60,20 ,"Kurs nach hinten fahren"
+(480,1220),60,20 ,"Kurs nach hinten fahren"
+(1520,840),60,20 ,"Kurs nach vorn fahren"
+(1520,1270),60,20 ,"Kurs nach vorn fahren"
+(2180,770),10,10 ,"0"
+(130,170),60,20 ,"Drehen nach hinten"
+(1800,630),60,20 ,"Drehen nach hinten"
+(130,60),60,20 ,"Kurs nach hinten starten"
+(430,1090),10,10 ,"0"
+(930,440),10,10 ,"0"
+(1470,640),10,10 ,"0"
+(1470,1140),10,10 ,"0"
+(1900,360),10,10 ,"0"
+(330,1370),60,20 ,"Drehen nach hinten"
+(1370,1420),60,20 ,"Drehen nach vorn"
+(980,570),60,20 ,"Drehen nach hinten"
+(1950,490),60,20 ,"Drehen nach vorn"
+(2350,930),60,20 ,"Kurs nach hinten fahren"
+(830,230),60,20 ,"Kurs nach hinten fahren"
+(1800,150),60,20 ,"Kurs nach vorn fahren"
+(1170,100),60,20 ,"Kurs nach vorn starten"
+(980,500),60,20 ,"Kurs nach vorn starten"
+(480,720),60,20 ,"Kurs nach vorn starten"
+(480,1150),60,20 ,"Kurs nach vorn starten"
+(1950,420),60,20 ,"Kurs nach hinten starten"
+(1520,770),60,20 ,"Kurs nach hinten starten"
+(1520,1200),60,20 ,"Kurs nach hinten starten"
+(830,1120),60,20 ,"Drehen nach hinten"
+(830,810),60,20 ,"Pause hinten"
+(480,440),60,20 ,"Pause hinten"
+(1520,490),60,20 ,"Pause vorn"
+(1800,1030),60,20 ,"Drehen nach vorn"
+(1800,720),60,20 ,"Pause vorn"
+(1520,700),60,20 ,"Drehen nach vorn"
+(480,650),60,20 ,"Drehen nach hinten"
+}
+A {
+(830,390);(830,430)
+y(830,680);(830,720)
+(1230,230);(1280,230)
+(1800,310);(1800,350)
+n(1750,580);(1650,580);(1650,270);(1700,270)
+(330,550);(330,580)
+n(380,600);(420,600)
+n(260,880);(220,880);(220,530)
+n(330,830);(330,860)
+y(330,900);(330,940)
+(330,980);(330,1010)
+(330,1050);(330,1080)
+n(330,1260);(330,1290)
+y(330,1330);(330,1370)
+n(260,1310);(210,1310);(210,1030);(240,1030)
+y(380,810);(420,810)
+y(380,1240);(420,1240)
+(1370,600);(1370,630)
+n(1300,930);(1260,930);(1260,580)
+n(1370,880);(1370,910)
+y(1370,950);(1370,990)
+(1370,1030);(1370,1060)
+(1370,1100);(1370,1130)
+n(1370,1310);(1370,1340)
+y(1370,1380);(1370,1420)
+n(1300,1360);(1250,1360);(1250,1080);(1280,1080)
+y(1420,860);(1460,860)
+y(1420,1290);(1460,1290)
+(2350,820);(2350,850)
+(2190,780);(2230,780)
+(190,190);(240,190)
+(1370,400);(1370,420)
+n(1300,440);(1240,440);(1240,380);(1280,380)
+(330,350);(330,370)
+n(260,390);(200,390);(200,330);(240,330)
+n(780,660);(640,660);(640,350);(730,350)
+n(380,1100);(420,1100)
+n(880,450);(920,450)
+n(1420,650);(1460,650)
+n(1420,1150);(1460,1150)
+n(1850,370);(1890,370)
+n(2300,870);(2230,870);(2230,780)
+(2230,780);(2270,780)
+y(2350,890);(2350,930)
+y(1800,390);(1800,420)
+y(830,470);(830,500)
+n(830,540);(830,570)
+y(830,610);(830,640)
+n(880,590);(920,590)
+n(1800,460);(1800,490)
+y(1800,530);(1800,560)
+n(1850,510);(1890,510)
+(830,270);(830,310)
+(1800,190);(1800,230)
+(1230,120);(1320,120)
+(330,100);(330,150)
+(190,80);(280,80)
+(1370,140);(1370,190)
+y(880,520);(920,520)
+n(330,760);(330,790)
+y(380,740);(420,740)
+y(330,1120);(330,1150)
+n(330,1190);(330,1220)
+y(380,1170);(420,1170)
+y(1850,440);(1890,440)
+n(1370,810);(1370,840)
+y(1420,790);(1460,790)
+y(1370,1170);(1370,1200)
+n(1370,1240);(1370,1270)
+y(1420,1220);(1460,1220)
+y(1800,600);(1800,630)
+(830,950);(830,980)
+(830,1020);(830,1050)
+n(760,1070);(720,1070);(720,1000);(780,1000)
+y(830,1090);(830,1120)
+(830,850);(830,890)
+y(330,410);(330,440)
+n(330,480);(330,510)
+y(380,460);(420,460)
+y(1370,460);(1370,490)
+n(1370,530);(1370,560)
+y(1420,510);(1460,510)
+(1800,860);(1800,890)
+(1800,930);(1800,960)
+n(1730,980);(1690,980);(1690,910);(1750,910)
+y(1800,1000);(1800,1030)
+(1800,760);(1800,800)
+y(1370,670);(1370,700)
+y(1420,720);(1460,720)
+n(1370,740);(1370,770)
+y(330,620);(330,650)
+y(380,670);(420,670)
+n(330,690);(330,720)
+(330,230);(330,250)
+y(330,290);(330,310)
+(1370,270);(1370,290)
+y(1370,330);(1370,360)
+n(1320,310);(1210,310);(1210,580);(1260,580)
+(1260,580);(1300,580)
+n(280,270);(170,270);(170,530);(220,530)
+(220,530);(260,530)
+}
+T {
+(80,380),50,50 ,"Zuerst das Boot in den Kurs drehen."
+(70,740),50,50 ,"Drehen auf der Stelle ist misslungen,
+dann versuchen mit Rückwärtsfahrt zu drehen."
+(1120,360),50,50 ,"Zuerst das Boot in den Kurs drehen."
+(1120,780),50,50 ,"Drehen auf der Stelle ist misslungen,
+dann versuchen mit Rückwärtsfahrt zu drehen."
+}
+}

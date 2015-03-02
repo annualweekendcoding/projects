@@ -15,6 +15,7 @@
 #define REAL float
 #define LREAL double
 #define VOID void
+#define TIME DINT
 
 /* Konvertierfunktionen */
 #define BOOL_TO_BYTE

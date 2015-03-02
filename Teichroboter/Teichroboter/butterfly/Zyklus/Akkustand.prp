@@ -1,0 +1,36 @@
+PRAP {
+V1100 
+"PROC_TYPE"="FUNCTION_BLOCK"
+.Vars {
+"AKKU_NIEDRIG","BOOL","akku_niedrig","Akku niedrig","14","",0,0,0,2
+"AKKU_SPANNUNG","INT","akku_spannung","Spannung des Akkus","4","",0,0,0,1
+"_INIT","BOOL","init","Initialisierungsvariable","16","",0,0,0,1281
+"_Op0","BYTE","","","0","",0,0,1,259
+"_P0","BOOL","","","0","",0,0,1,514
+"_P1","BOOL","","","0","",0,0,1,66050
+}
+IniOp: 0
+OpVars {
+"Akku niedrig","nicht Akku niedrig"="|AKKU_NIEDRIG|||"
+}
+PVars {
+"Akku unter Minimum","nicht Akku unter Minimum"="|_P0|VGL|AKKU_SPANNUNG<1000|"
+"Akku über Wiedereinschalten","nicht Akku über Wiedereinschalten"="|_P1|VGL|AKKU_SPANNUNG>1200|"
+}
+O {
+(280,130),50,20 ,"",{}
+(280,290),50,20 ,"",{0}
+}
+P {
+(280,210),60,20 ,0
+(280,370),60,20 ,1
+}
+A {
+(280,170);(280,210)
+y(280,250);(280,290)
+(280,330);(280,370)
+n(220,230);(160,230);(160,150);(230,150)
+n(220,390);(180,390);(180,310);(230,310)
+y(340,390);(380,390);(380,230);(340,230)
+}
+}

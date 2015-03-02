@@ -1,0 +1,6 @@
+[Connection]
+ConnectionString=Data Source=%DBFILE%.mdb;Persist Security Info=False
+Provider=Microsoft.Jet.OLEDB.4.0
+[properties]
+singleStateVar=1
+TRANSFER_TYPE=None
