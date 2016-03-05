@@ -1,31 +1,31 @@
 import cv2
 
 cv2.namedWindow('camera')
-cv2.namedWindow('img1')
-cv2.namedWindow('img2')
+cv2.namedWindow('marker1')
+cv2.namedWindow('marker2')
 
-img1 = cv2.imread('../kiste.jpg')
-img2 = cv2.imread('../lampe.jpg')
-img1 = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
-img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+marker1 = cv2.imread('marker1.png')
+marker1 = cv2.cvtColor(marker1,cv2.COLOR_BGR2GRAY)
+marker2 = cv2.imread('marker2.png')
+marker2 = cv2.cvtColor(marker2,cv2.COLOR_BGR2GRAY)
 
 detector = cv2.FeatureDetector_create("GFTT")
 descriptor = cv2.DescriptorExtractor_create("SURF")
 
 # detect keypoints
-kp1 = detector.detect(img1)
-kp2 = detector.detect(img2)
+kp1 = detector.detect(marker1)
+kp2 = detector.detect(marker2)
 print '#keypoints in image1: %d, image2: %d' % (len(kp1), len(kp2))
 
-img_disp = cv2.drawKeypoints(img1,kp1,None,(255,0,0),4)
-cv2.imshow('img1',img_disp)
+img_disp = cv2.drawKeypoints(marker1,kp1,None,(255,0,0),4)
+cv2.imshow('marker1',img_disp)
 
-img_disp = cv2.drawKeypoints(img2,kp2,None,(255,0,0),4)
-cv2.imshow('img2',img_disp)
+img_disp = cv2.drawKeypoints(marker2,kp2,None,(255,0,0),4)
+cv2.imshow('marker2',img_disp)
 
 # descriptors
-k1, d1 = descriptor.compute(img1, kp1)
-k2, d2 = descriptor.compute(img2, kp2)
+k1, d1 = descriptor.compute(marker1, kp1)
+k2, d2 = descriptor.compute(marker2, kp2)
 
 matcher = cv2.BFMatcher() #FlannBasedMatcher()
     # pt1=(int(k1[m.queryIdx].pt[0]),int(k1[m.queryIdx].pt[1]))("FlannBased")
