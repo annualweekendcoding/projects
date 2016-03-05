@@ -1,0 +1,30 @@
+#!/usr/bin/python
+import pymodbus
+import serial
+from pymodbus.pdu import ModbusRequest
+from pymodbus.client.sync import ModbusSerialClient
+from pymodbus.transaction import ModbusRtuFramer
+
+import logging
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+
+client= ModbusSerialClient(method="rtu", port="/dev/ttyAMA0", stopbits=1, bytesize=8,
+                           parity='N', baudrate=9600, timeout=0.2 )
+
+#connect to the serial modbus server
+connection = client.connect()
+print connection
+
+#starting add, num of reg to read, slave unit.
+while True:
+    result= client.read_holding_registers(0,9,11)
+    print(result.registers)
+
+
+result=client.write_register(0, not result.registers[0],11)
+#print(result)
+
+#closes the underlying socket connection
+client.close()
