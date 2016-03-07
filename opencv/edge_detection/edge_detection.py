@@ -4,7 +4,8 @@ import numpy as np
 import zbar
 import Image
 
-picam = False
+import os
+picam = os.uname()[4].startswith('arm')
 if picam:
     from picamera import PiCamera
     from picamera.array import PiRGBArray
@@ -23,7 +24,7 @@ cv2.namedWindow('camera')
 
 resolution = (1024, 768)
 if picam:
-    camera = PiCamera(resolution, framerate=10)
+    camera = PiCamera(resolution=resolution, framerate=10)
     print camera.resolution
 else:
     camera = cv2.VideoCapture(0)
@@ -34,7 +35,7 @@ else:
 time.sleep(0.1)
 
 scanner = zbar.ImageScanner()
-scanner.parse_config('enable')
+scanner.parse_config('qrcode.enable')
 
 count = 0
 while 1:
