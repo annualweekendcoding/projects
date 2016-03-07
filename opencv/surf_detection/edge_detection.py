@@ -5,19 +5,45 @@ import cv2
 import numpy as np
 import time
 import zbar
+import argparse
+import os
 
-#marker1 = cv2.imread('marker1.png')
-#marker1 = cv2.cvtColor(marker1,cv2.COLOR_BGR2GRAY)
+parser = argparse.ArgumentParser(description='Bilderkennung von QR-Codes in Rechtecken.')
+parser.add_argument('-nx', '--no-x', action='store_true', help='X-Display ausschalten')
+parser.add_argument('-np', '--no-picam', action='store_true', help='Pi-Camera nicht verwenden')
+parser.add_argument('-uv', '--use-video', action='store_true', help='Pi-Camera nicht verwenden')
+parser.add_argument('-x', '--width', default=640, type=int, help='X-Aufloesung der Kamera')
+parser.add_argument('-y', '--height', default=480, type=int, help='Y-Aufloesung der Kamera')
+parser.add_argument('-f', '--framerate', default=10, type=int, help='Framerate der Kamera')
 
-cv2.namedWindow('camera')
+args = parser.parse_args()
 
-capture = cv2.VideoCapture(0)
-capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,1280)
-capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,720)
-time.sleep(2)
+use_display = not args.no_x
 
-img_width = capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
-img_height = capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
+if args.no_picam:
+    picam = False
+else:
+    picam = os.uname()[4].startswith('arm')
+
+if picam:
+    from picamera import PiCamera
+    from picamera.array import PiRGBArray
+
+if use_display: cv2.namedWindow('camera')
+
+resolution = (args.width, args.height)
+if picam:
+    camera = PiCamera(resolution=resolution, framerate=args.framerate)
+    print "Resolution:", camera.resolution
+else:
+    camera = cv2.VideoCapture(0)
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, resolution[0])
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, resolution[1])
+    camera.set(cv2.cv.CV_CAP_PROP_FPS, args.framerate)
+    print "Resolution:", camera.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH), camera.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
+    print "Framerate:", camera.get(cv2.cv.CV_CAP_PROP_FPS)
+
+time.sleep(0.1)
 
 scanner = zbar.ImageScanner()
 # Scanner nur fuer QRCodes freischalten
@@ -25,11 +51,20 @@ scanner.parse_config('enable=0')
 scanner.parse_config('qrcode.enable=1')
 
 while 1:
+    start_time=time.clock()
+
     k = cv2.waitKey(10)
     if chr(k & 255) == 'q':
         break
 
-    for i in range(1,5): ret, img = capture.read()
+    if picam:
+        rawCapture = PiRGBArray(camera)
+        camera.capture(rawCapture, use_video_port=args.use_video, format='bgr')
+        img = rawCapture.array
+        ret = img is not None
+    else:
+        for i in range(1,5): ret, img = camera.read()
+
     if not ret: continue
 
     img = cv2.GaussianBlur(img,(3,3),0)
@@ -40,7 +75,7 @@ while 1:
     #clahe = cv2.createCLAHE(2.0, (4,4))
     #img = clahe.apply(img)
 
-    img_disp = img.copy()
+    if use_display: img_disp = img.copy()
     #img_disp = img.copy()
 
     img = cv2.Canny(img,50,150)
@@ -77,9 +112,9 @@ while 1:
                             polys.append(poly)
                             break
 
-
-    img_disp = cv2.cvtColor(img_disp,cv2.COLOR_GRAY2BGR)
-    img_disp = np.zeros((img_height,img_width,3), np.uint8)
+    if use_display:
+        img_disp = cv2.cvtColor(img_disp,cv2.COLOR_GRAY2BGR)
+        img_disp = np.zeros(((resolution[1]), (resolution[0]), 3), np.uint8)
 
     if len(polys)>0:
         print len(polys1), len(polys)
@@ -99,15 +134,20 @@ while 1:
         for symbol in zbar_img:
             print "Code:", symbol.data
             # Im Zentrum des Polygons ein roter Punkt
-            cv2.circle(img_disp,(cx,cy),5,(0,0,255),-1)
+            if use_display: cv2.circle(img_disp,(cx,cy),5,(0,0,255),-1)
 
-        roi_color = cv2.cvtColor(roi,cv2.COLOR_GRAY2BGR)
-        img_disp[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] = roi_color
+        if use_display:
+            roi_color = cv2.cvtColor(roi,cv2.COLOR_GRAY2BGR)
+            img_disp[r[1]:r[1]+r[3], r[0]:r[0]+r[2]] = roi_color
 
 
-    cv2.drawContours(img_disp,polys1,-1,(255,0,0))
-    cv2.drawContours(img_disp,polys,-1,(0,255,0))
+    if use_display:
+        cv2.drawContours(img_disp,polys1,-1,(255,0,0))
+        cv2.drawContours(img_disp,polys,-1,(0,255,0))
+        img_disp = cv2.resize(img_disp, (int(resolution[0] / 2), int(resolution[1] / 2)))
+        # Bild im Fenster anzeigen
+        cv2.imshow('camera',img_disp)
 
-    img_disp = cv2.resize(img_disp,(int(img_width/2),int(img_height/2)))
-    # Bild im Fenster anzeigen
-    cv2.imshow('camera',img_disp)
+    print "Zykluszeit: ", time.clock()-start_time
+
+if use_display: cv2.destroyAllWindows()
