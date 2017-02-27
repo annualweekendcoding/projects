@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DAEMON=camera_download.pl
+PROGRAMM=/home/pi/$DAEMON
+ps auxw | grep "^${LOGNAME}.*${DAEMON}" | grep -v grep > /dev/null
+
+if [ $? != 0 ]
+then
+   ${PROGRAMM} >> $PROGRAMM.log &
+fi
