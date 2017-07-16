@@ -5,9 +5,10 @@
 -- Globale Variablen werden aus den cfg-Dateien und Parametern gelesen
 -- Hier sind die Default-Werte
 write_log = false -- log in eine log-Datei schreiben
-print_log = true -- log auf Standard-Ausgabe
+print_log = false -- log auf Standard-Ausgabe
+print_result = true -- result auf Standard-Ausgabe
 ftp_uri = "" -- ftp://user:pass@host:port/dir
-lastupload = "" -- kennzeichnet die letzte übertragene Datei
+lastupload = "0000" -- kennzeichnet die letzte übertragene Datei
 singlefile = true -- überträgt nur eine Datei und dann Ende, auch bei Fehler
 upload_all = false -- überträgt alle Dateien unabhängig von lastupload
 
@@ -35,6 +36,9 @@ local function readConfigKeyValue(key,val)
     elseif (key == "print_log") then
         -- print_log=1
         print_log = tonumber(val)>0
+    elseif (key == "print_result") then
+        -- print_result=1
+        print_result = tonumber(val)>0
     elseif (key == "singlefile") then
         -- singlefile=1
         singlefile = tonumber(val)>0
@@ -42,7 +46,10 @@ local function readConfigKeyValue(key,val)
         -- upload_all=1
         upload_all = tonumber(val)>0
     else
-        writeLog("unbekannter Parameter: "..key.."="..val.."\n")
+        if (print_result) then
+            print ("ERROR unbekannter Parameter: "..key.."="..val)
+        end
+        writeLog("unbekannter Parameter: "..key.."="..val)
     end
 end
 
@@ -90,12 +97,10 @@ local function readArgs()
     end
 end
 
-local function writeLastupload(cfg_name, _dir, _file)
+local function writeLastupload(cfg_name)
     -- schreibt den Wert für die letzte Bilddatei in eine Datei
     local wFile = io.open(cfg_name, "w")
     if (wFile == nil) then return end
-
-    lastupload = _dir:sub(1, 3).._file:sub(5, 8)
     wFile:write("lastupload="..lastupload.."\n")
     io.close(wFile)
 end
@@ -114,43 +119,59 @@ local function autoUpload()
             for aFile in lfs.dir("/DCIM/"..aDirectory) do
                 local filePath = "/DCIM/"..aDirectory.."/"..aFile
 				writeLog("Teste "..filePath)
-                if lfs.attributes(filePath, "mode") ~= "file" then
-                    goto continue
-                end
-                if aFile:sub(-4) ~= ".JPG" then
-                    -- alles was keine JPG-Dateien sind übergehen
-				    goto continue
-                end				
-                if not upload_all then
-                    local photoNum = tonumber(aFile:sub(5, 8))
-                    if lastPhoto >= photoNum then
-                        -- zu kleine Fotonummer übergehen
-                        goto continue
-                    else
-                        lastPhoto = photoNum
+                -- Es muss eine Datei sein, aber nicht die FlashAir-Systemdatei
+                if lfs.attributes(filePath, "mode") == "file" and aFile ~= "FA000001.JPG" then
+                    -- verschiedene Dateinamensformate werden getestet und in eine Nummer umgewandelt
+                    -- z.B. IMG_... für CANON
+                    --      DSC ... für SONY
+                    --      DSCF ... für FUJI
+                    --      P ...
+                    -- Es sollten eigentlich alle existierenden Varianten abgedeckt sein
+                    -- zuerst Format mit einem Buchstaben testen
+                    local photoNum = aFile:match("^[A-Z](%d+).JPE?G$")
+                    if photoNum == nil then
+                        -- Format mit 3 Zeichen testen
+                        photoNum = aFile:match("^[A-Z0-9][A-Z0-9][A-Z0-9](%d+).JPE?G$")
+                        if photoNum == nil then
+                            -- Format mit 3 Zeichen und Unterstrich oder 4. Buchstaben testen
+                            photoNum = aFile:match("^[A-Z0-9][A-Z0-9][A-Z0-9][_A-Z](%d+).JPE?G$")
+                        end
+                        if photoNum == nil then
+                            writeLog("Dateiname "..aFile.." wurde nicht als Bild erkannt.")
+                        end
+                    end
+                    --writeLog("photoNum="..photoNum)
+                    if photoNum ~= nil and (upload_all or lastPhoto < tonumber(photoNum)) then
+                        -- Dateinummer aus Verzeichnis und Nummer in der Datei zusammensetzen
+                        local fileNum = aDirectory:sub(1, 3)..photoNum
+                        -- als Zieldatei die lange Nummer verwenden
+                        local destFile = "P"..fileNum..".JPG"
+                        local res = fa.ftp("put",ftp_uri..destFile,filePath)
+                        if res==1 then
+                            if print_result then
+                                print ("STORED "..destFile)
+                            end
+                            writeLog("FTP-Upload Erfolg "..ftp_uri..destFile.." "..filePath)
+                            lastupload = fileNum
+                            writeLastupload("/lua/lastupload.cfg")
+                        else
+                            if print_result then
+                                print ("ERROR "..destFile)
+                            end
+                            writeLog("FTP-Upload Fehler "..ftp_uri..destFile.." "..filePath)
+                            -- Bei FTP-Fehler eine 1 zurückliefern, damit wiederholt wird
+                            return 1
+                        end
+                        if singlefile then
+                            return 0
+                        end
                     end
                 end
-                local res = fa.ftp("put",ftp_uri..aFile,filePath)
-                if res==1 then
-					writeLog("FTP-Upload Erfolg "..ftp_uri..aFile.." "..filePath)
-                    writeLastupload("/lua/lastupload.cfg", aDirectory, aFile)
-				else
-					writeLog("FTP-Upload Fehler "..ftp_uri..aFile.." "..filePath)
-				    -- Bei FTP-Fehler eine 1 zurückliefern, damit wiederholt wird
-                    return 1
-                end
-                if singlefile then
-                    return 0
-                end
-
-                ::continue::
             end
-            lastPhoto = 0
         end
     end
 	return 0
 end
-
 
 local function waitWlanConnect()
     -- Wartet bis das WLAN verbunden ist
@@ -183,28 +204,7 @@ local function main()
     writeLog("end")
 end
 
---readConfig("/daten/annualweekendcoding/projects/flashair/auto_upload/auto_upload.cfg")
 readConfig("/lua/auto_upload.cfg")
 readConfig("/lua/lastupload.cfg")
 readArgs()
 main()
-
---[[
--- Hauptprogramm mit locking
-
--- Lockfile erzeugen
---writeLog("lock")
-local lock, message = lfs.mkdir("/lua/lock")
-if lock then
-    writeLog("lock ok")
-    -- nur wenn Lock erfolgreich, ausführen
-    local status, err = pcall(main())
-    -- Lock wieder freigeben
-    lfs.rmdir("/lua/lock")
-    if status then
-        writeLog("Exception: "..err)
-    end
-else
-    writeLog("Lock Failed")
-end
---]]

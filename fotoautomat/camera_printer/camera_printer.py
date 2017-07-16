@@ -10,22 +10,14 @@ import time
 from PIL import Image, ExifTags
 import numpy as np
 import random
-
-raspberry=False
-if platform.system()=='Linux':
-    from subprocess import call
-    import RPi.GPIO as GPIO
-    # RPi.GPIO Layout verwenden (wie Pin-Nummern)
-    GPIO.setmode(GPIO.BOARD)
-    # Pin 18 (GPIO 24) auf Input setzen
-    GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    raspberry=True
+import sys
 
 parser = argparse.ArgumentParser(description="Verzeichnis überwachen und neues Bild drucken.")
-parser.add_argument('-d', '--dir', default=r"//192.168.179.25/pi/camera_ready", type=str, help='Verzeichnis mit den fertigen Bildern')
-parser.add_argument('-ud', '--uploaddir', default=r"//192.168.179.25/pi/camera", type=str, help='Verzeichnis mit den Bildern beim Upload')
-parser.add_argument('-pd', '--printdir', default=r"//192.168.179.25/pi/camera_print", type=str, help='Verzeichnis mit den gedruckten Bildern')
-parser.add_argument('-td', '--trashdir', default=r"//192.168.179.25/pi/camera_trash", type=str, help='Verzeichnis mit den gelöschten Bildern')
+parser.add_argument('-d', '--dir', default="camera_ready", type=str, help='Verzeichnis mit den fertigen Bildern')
+parser.add_argument('-ud', '--uploaddir', default="camera", type=str, help='Verzeichnis mit den Bildern beim Upload')
+parser.add_argument('-pd', '--printdir', default="camera_print", type=str, help='Verzeichnis mit den gedruckten Bildern')
+parser.add_argument('-td', '--trashdir', default="camera_trash", type=str, help='Verzeichnis mit den gelöschten Bildern')
+parser.add_argument('-dp', '--dirprefix', default="", type=str, help='Prefix vor allen Verzeichnissen')
 parser.add_argument('-sw', '--screenwidth', default=1366, type=int, help='X-Auflösung des Bildschirms')
 parser.add_argument('-sh', '--screenheight', default=768, type=int, help='Y-Auflösung des Bildschirms')
 parser.add_argument('-pw', '--printwidth', default=900, type=int, help='X-Auflösung des Druckers')
@@ -34,14 +26,30 @@ parser.add_argument('-ssw', '--slideshow_wait', default=60, type=int, help='Wart
 parser.add_argument('-ssi', '--slideshow_interval', default=15, type=int, help='Intervallzeit der Slideshow')
 args = parser.parse_args()
 
-dir = args.dir
-uploaddir = args.uploaddir
-printdir = args.printdir
-trashdir = args.trashdir
+dir = args.dirprefix + args.dir
+uploaddir = args.dirprefix + args.uploaddir
+printdir = args.dirprefix + args.printdir
+trashdir = args.dirprefix + args.trashdir
 screensize = (args.screenwidth,args.screenheight)
 printsize = (args.printwidth,args.printheight)
 slideshow_wait = args.slideshow_wait
 slideshow_interval = args.slideshow_interval
+
+# Die Dateinummer setzt sich aus 3 Stellen Verzeichnis und max 7 Stellen Datei zusammen
+MAXFILENUM = 9999999999
+
+# Unterscheidung wenn Linux wird hier der Raspberry angenommen, ansonsten wird ggf. unter Windows getestet.
+raspberry=False
+if platform.system()=='Linux':
+    from subprocess import call
+    import RPi.GPIO as GPIO
+    # RPi.GPIO Layout verwenden (wie Pin-Nummern)
+    GPIO.setmode(GPIO.BOARD)
+    # Pin 18 (GPIO 24) auf Input setzen
+    GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # Flanke einlesen, falls Taste jetzt schon gedrueckt
+    drucktaste_flanke = (GPIO.input(18) == GPIO.HIGH)
+    raspberry=True
 
 mouse_x = 0
 mouse_y = 0
@@ -57,27 +65,32 @@ cv2.namedWindow('screen',cv2.WINDOW_NORMAL)
 cv2.setWindowProperty('screen',cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
 cv2.setMouseCallback('screen',mouseevent)
 
+#globales Verzeichnis aller Zuordnungen zwischen Nummern und Dateinamen
+filedic = {}
+
 def getminmaxfilenum(dir):
     # liefert die kleinste und höchste Dateinummer in einem Verzeichnis
-    minnum=10000
+    minnum=MAXFILENUM+1
     maxnum=-1
-    files = os.listdir(dir)
-    for file in files:
-        match = re.match(r'IMG_(\d+).JPG',file)
-        if match:
-            num = int(match.group(1))
-            if num>maxnum:
-                maxnum = num
-            if num<minnum:
-                minnum = num
+    try:
+        files = os.listdir(dir)
+        for file in files:
+            match = re.match(r'[A-Z_]*(\d+).JPG',file)
+            if match:
+                num = int(match.group(1))
+                filedic[num] = file
+                if num>maxnum:
+                    maxnum = num
+                if num<minnum:
+                    minnum = num
+    except:
+        # Es ist egal was hier schief geht, dann haben wir nur keine Nummern
+        pass
     return minnum, maxnum
 
-def getimgfilename(filenum):
-    return "IMG_{0:04d}.JPG".format(filenum)
-
 def getnextimgfilenum(dir,filenum,direction):
-    while filenum>0 and filenum<10000:
-        if os.path.isfile(dir+'/'+getimgfilename(filenum)):
+    while filenum>0 and filenum<MAXFILENUM+1:
+        if filenum in filedic:
             break
         filenum += direction
     return filenum
@@ -101,14 +114,26 @@ def rotate_90n(src, angle):
         raise
     return dst
 
-minfilenum = 10000
+def CenterPictureOnPicture(img,filename):
+    # Diese Funktion setzt ein Bild aus einer Datei zentriert auf das übergebene Bild
+    small = cv2.imread(filename)
+    if not small is None:
+        small_h,small_w = small.shape[:2]
+        img_h,img_w = img.shape[:2]
+        # TODO: Wenn Bild zu groß ist, dann verkleinern
+        if small_w<img_w and small_h<img_h:
+            y = (img_h-small_h)/2
+            x = (img_w-small_w)/2
+            img[y:y+small_h, x:x+small_w] = small
+    return img
+
+minfilenum = MAXFILENUM+1
 lastfilenum = 0
 lastfilenum_mem = 0
 filenum = 0
 processedfilenum = 0
 key=0
 do_print = False
-drucktaste_flanke = False
 img = None
 imgfilename = None
 imgrotate=0
@@ -133,7 +158,7 @@ while not end:
 
         if filenum != processedfilenum:
             processedfilenum = filenum
-            imgfilename = getimgfilename(filenum)
+            imgfilename = filedic[filenum]
             f = dir+'/'+imgfilename
             if os.path.isfile(f):
                 pilimg = Image.open(f)
@@ -187,21 +212,29 @@ while not end:
             # Bild soll gedruckt werden
             do_print = False
             # Anzeige erzeugen
-            cv2.putText(img_disp,"Bild wird gedruckt...",(0,50),cv2.FONT_ITALIC, 2, (200,255,155), 2)
+
+            img_disp = CenterPictureOnPicture(img_disp,"Bild_wird_gedruckt.png")
             cv2.imshow('screen',img_disp)
             k = cv2.waitKey(1)
             if ikey==0:
                 ikey = k
-            img_print = cv2.resize(img, printsize, 0, 0, cv2.cv.CV_INTER_AREA)
-            printfile = printdir+'/'+imgfilename
-            cv2.imwrite(printfile,img_print)
+            #img_print = cv2.resize(img, printsize, 0, 0, cv2.cv.CV_INTER_AREA)
+            #printfile = printdir+'/'+imgfilename
+            #cv2.imwrite(printfile,img_print)
             if raspberry:
-                call(['obexftp', '-b', '00:04:48:17:92:E7', '--nopath', '--noconn', '--uuid', 'none', '--channel', '1', '-p', printfile])
+                # Bluetooth Drucker
+                #call(['obexftp', '-b', '00:04:48:17:92:E7', '--nopath', '--noconn', '--uuid', 'none', '--channel', '1', '-p', printfile])
+                # Druckjob auf Windows Rechner, Datei übertragen
+                olddir = os.getcwd()
+                # printdir, wenn oben resize erfolgt
+                os.chdir(dir)
+                call(['smbclient', '-A', '/home/pi/smbclient.conf', '//192.168.2.2/print', '-c', 'put '+imgfilename])
+                os.chdir(olddir)
             lastaction_time = time.time()
             time.sleep(1)
         elif uploadnum>0:
             # Ladeanzeige, nur wenn nicht gerade gedruckt wird
-            cv2.putText(img_disp,"Bild "+str(uploadnum)+" wird geladen...",(0,50),cv2.FONT_ITALIC, 2, (200,255,155), 2)
+            img_disp = CenterPictureOnPicture(img_disp,"Neue_Bilder_werden_geladen.png")
             lastaction_time = time.time()
 
         if time.time()-lastaction_time > slideshow_wait:
@@ -227,47 +260,53 @@ while not end:
             lastslide_time = lastaction_time - slideshow_interval;
 
         cv2.imshow('screen',img_disp)
-        if ikey<=0:
-            ikey = cv2.waitKey(10)
-        while ikey>0:
-            lastaction_time = time.time()
-            key = chr(ikey & 255)
-            if ikey>0:
-                print "Taste:",ikey,",",ikey & 255
-            if (ikey & 255) == 27:
-                end = True
-                break
-            elif key == 'l':
-                # aktuelle Datei Löschen
-                os.rename(dir+'/'+imgfilename,trashdir+'/'+imgfilename)
-                if not os.path.isfile(dir+'/'+imgfilename):
-                    cv2.putText(img_disp,"Bild "+imgfilename+" wurde geloescht.",(0,50),cv2.FONT_ITALIC, 2, (200,255,155), 2)
-                    filenum = getnextimgfilenum(dir,filenum,-1)
-                    if filenum<minfilenum:
-                        filenum = getnextimgfilenum(dir,minfilenum,1)
-                else:
-                    cv2.putText(img_disp,"Bild "+imgfilename+" konnte nicht geloescht werden.",(0,50),cv2.FONT_ITALIC, 2, (200,255,155), 2)
-                cv2.imshow('screen',img_disp)
-                time.sleep(1)
-            # Sondertasten auswerten (die großen Zahlen sind Windows die kleinen Linux)
-            elif key == 's':
-                # Slideshow starten
-                lastaction_time = time.time() - slideshow_wait
-            elif ikey == 2490368: # up
-                pass
-            elif ikey == 2621440: # down
-                pass
-            elif ikey == 2424832 or ikey == 65361: #left
-                if filenum>0:
-                    filenum = getnextimgfilenum(dir,filenum-1,-1)
-            elif ikey == 2555904 or ikey == 65363: #right
-                if filenum<lastfilenum:
-                    filenum = getnextimgfilenum(dir,filenum+1,1)
-            elif ikey == 2293760 or ikey == 65367: # End
-                filenum = lastfilenum
-            elif ikey == 2359296 or ikey == 65360: # Pos1
-                filenum = getnextimgfilenum(dir,minfilenum,1)
-            ikey = cv2.waitKey(1)
     except:
-        pass
+        print "Exception unbehandelt: ",sys.exc_info()[0]
+        time.sleep(10)
+
+    if ikey<=0:
+        ikey = cv2.waitKey(10)
+    while ikey>0:
+        lastaction_time = time.time()
+        key = chr(ikey & 255)
+        if ikey>0:
+            print "Taste:",ikey,",",ikey & 255
+        if (ikey & 255) == 27:
+            end = True
+            break
+        elif key == 'l':
+            # aktuelle Datei Löschen
+            try:
+                os.rename(dir+'/'+imgfilename,trashdir+'/'+imgfilename)
+                img_disp = CenterPictureOnPicture(img_disp,"Bild_wurde_geloescht.png")
+                filenum = getnextimgfilenum(dir,filenum,-1)
+                if filenum<minfilenum:
+                    filenum = getnextimgfilenum(dir,minfilenum,1)
+            except:
+                img_disp = CenterPictureOnPicture(img_disp,"Bild_konnte_nicht_geloescht_werden.png")
+            cv2.imshow('screen',img_disp)
+        # Sondertasten auswerten (die großen Zahlen sind Windows die kleinen Linux)
+        elif key == 's':
+            # Slideshow starten
+            lastaction_time = time.time() - slideshow_wait
+        elif ikey == 2490368: # up
+            pass
+        elif ikey == 2621440: # down
+            pass
+        elif ikey == 2424832 or ikey == 65361: #left
+            if filenum>0:
+                filenum = getnextimgfilenum(dir,filenum-1,-1)
+        elif ikey == 2555904 or ikey == 65363: #right
+            if filenum<lastfilenum:
+                filenum = getnextimgfilenum(dir,filenum+1,1)
+        elif ikey == 2293760 or ikey == 65367: # End
+            filenum = lastfilenum
+        elif ikey == 2359296 or ikey == 65360: # Pos1
+            filenum = getnextimgfilenum(dir,minfilenum,1)
+        elif key!='d':
+            # Hilfe für die Tastenbelegung anzeigen
+            img_help = cv2.imread("tastaturhilfe.png")
+            cv2.imshow('screen',img_help)
+            cv2.waitKey(10000)
+        ikey = cv2.waitKey(1000)
 cv2.destroyAllWindows()

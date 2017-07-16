@@ -2,10 +2,10 @@
 
 use strict;
 
-my $cameranetwork='192.168.0';
-my $cameraurl="http://$cameranetwork.1";
-my $cameradir='camera/';
-
+my $cameraNetwork='192.168.0';
+my $cameraUrl="http://$cameraNetwork.1";
+my $cameraDir='camera/';
+my $cameraReadyDir='camera_ready/';
 
 my $ftp_uri="";
 
@@ -19,7 +19,7 @@ while (1)
   my $ok=0;
   if ($ftp_uri ne "")
   {
-    open CURL, "curl -s '$cameraurl/command.cgi?op=102' |";
+    open CURL, "curl -s '$cameraUrl/command.cgi?op=102' |";
     while (<CURL>)
     {
       chomp();
@@ -45,23 +45,35 @@ while (1)
 
 sub auto_upload()
 {
-  open CURL, "curl -s '$cameraurl/lua/auto_upload.lua?ftp_uri=$ftp_uri&singlefile=0' |";
+  open CURL, "curl -s '$cameraUrl/lua/auto_upload.lua?ftp_uri=$ftp_uri&singlefile=0' |";
   while (<CURL>)
   {
     print $_;
+    # beim Laden die fertigen Dateien schon mal verschieben
+    my ($file) = (/^STORED (.*)$/);
+    if ($file ne "")
+    {
+      system ("mv $cameraDir$file $cameraReadyDir"); 
+    }
   }
-}   
+  # nach dem Laden die restlichen Dateien verschieben
+  my @a = glob("$cameraDir*");
+  if ($#a >=0)
+  {
+    system ("mv $cameraDir* $cameraReadyDir"); 
+  }
+}     
 
 sub wait_for_ip()
 {
   # warten bis wir eine gültige IP-Adresse im Kameranetzwerk haben
   while ($ftp_uri eq "")
   {
-    open IFCONFIG, "ifconfig | grep $cameranetwork |";
+    open IFCONFIG, "ifconfig | grep $cameraNetwork |";
     while (<IFCONFIG>)
     {
-      my ($ipaddress) = (/inet .*($cameranetwork\.\d+).*$cameranetwork.*/);
-      $ftp_uri = "ftp://pi:.pi\@$ipaddress/$cameradir" if ($ipaddress ne "");
+      my ($ipaddress) = (/inet .*($cameraNetwork\.\d+).*$cameraNetwork.*/);
+      $ftp_uri = "ftp://pi:.pi\@$ipaddress/$cameraDir" if ($ipaddress ne "");
     }
     sleep(1) if ($ftp_uri eq "");
   }
