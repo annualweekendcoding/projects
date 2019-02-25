@@ -11,3 +11,13 @@
 
 /Fahrregler/android/out
 /Fahrregler/android/gen
+*.cpp~
+*.map
+*.obj
+*.pch
+/Teichsteuerung/ModbusUaTest/__history
+/Teichsteuerung/esp8266/teichsteuerung/avicstd/h/__history
+/Teichsteuerung/esp8266/teichsteuerung/avicstd/h/datatypes/__history
+wifi_secrets.h
+/Teichsteuerung/open62541-open62541-6249bb2
+/Teichsteuerung/windows/__history

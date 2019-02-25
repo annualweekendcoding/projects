@@ -20,7 +20,7 @@ args = parser.parse_args()
 
 use_display = not args.no_x
 
-if args.no_picam:
+if args.no_picam or True:
     picam = False
 else:
     picam = os.uname()[4].startswith('arm')

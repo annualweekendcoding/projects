@@ -1,0 +1,45 @@
+PRAP {
+V1100 
+.Vars {
+"_INIT","BOOL","FX(0,0)","Initialisierungsvariable","24","",0,0,0,1281
+"Temperatursensoren_Op0","BYTE","","","0","",0,0,1,259
+"Temperaturen_lesen","BOOL","QX(0,1)","Temperaturen vom OneWire einlesen","30","",0,0,0,2
+"Temperaturen_einschalten","BOOL","QX(0,6)","Spannung für Temperatursensoren einschalten","31","",0,0,0,2
+"time_ms","INT","FINT(2)","Ticks in Sekunden als Umlaufzähler","27","",0,0,0,1
+"Temperatursensoren_P0","BOOL","","","0","",0,0,1,514
+"Temperatursensoren_P1","BOOL","","","0","",0,0,1,66050
+"zeit_merk","INT","FINT(8)","gemerkte Zeit","32","",0,0,1,19
+"diff","INT","","","0","",0,0,1,19
+}
+IniOp: 0
+OpVars {
+"Temperaturen vom OneWire einlesen","nicht Temperaturen vom OneWire einlesen"="|Temperaturen_lesen|||"
+"Spannung für Temperatursensoren einschalten","nicht Spannung für Temperatursensoren einschalten"="|Temperaturen_einschalten|||"
+"Zeit merken","nicht Zeit merken"="||ARI|zeit_merk|time_ms"
+"Differenz berechnen","nicht Differenz berechnen"="||ARI|diff|time_ms-zeit_merk"
+}
+PVars {
+"10s vergangen","nicht 10s vergangen"="|Temperatursensoren_P0|VGL|diff>10000|"
+"weitere 10ms vergangen","nicht weitere 10ms vergangen"="|Temperatursensoren_P1|VGL|diff>10010|"
+}
+O {
+(300,70),50,20 ,"",{2}
+(300,160),50,20 ,"",{3}
+(300,500),110,40 ,"",{0,1}
+(300,320),90,40 ,"",{1,3}
+}
+P {
+(300,240),50,20 ,0
+(300,430),50,20 ,1
+}
+A {
+(300,110);(300,160)
+(300,200);(300,240)
+n(250,260);(200,260);(200,180);(250,180)
+y(300,280);(300,320)
+(300,400);(300,430)
+n(250,450);(180,450);(180,360);(210,360)
+y(300,470);(300,500)
+(410,540);(500,540);(500,90);(350,90)
+}
+}

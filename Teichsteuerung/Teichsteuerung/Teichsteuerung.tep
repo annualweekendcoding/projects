@@ -1,0 +1,11 @@
+[Connection]
+ConnectionString=Data Source=%DBFILE%.mdb;Persist Security Info=False
+Provider=Microsoft.Jet.OLEDB.4.0
+[properties]
+LANGUAGE=C
+TRANSFER_TYPE=File
+singleStateVar=1
+Includes=<global.st>
+VARFORMAT_OP=@PROC_NAME@_Op@num@
+VARFORMAT_P=@PROC_NAME@_P@num@
+VARFORMAT_F=@PROC_NAME@_F@num@

@@ -1,0 +1,204 @@
+PRAP {
+V1100 
+.Vars {
+"_INIT","BOOL","FX(0,0)","Initialisierungsvariable","24","",0,0,0,1281
+"Pumpensteuerung_Op0","BYTE","","aktive Operationsnummer","0","",0,0,1,259
+"time_last","INT","","gemerkte Zeit","0","",0,0,1,19
+"time_sec","INT","FINT(4)","Ticks in Sekunden als Umlaufzähler","9","",0,0,0,1
+"Pumpe_EIN","BOOL","QX(0,0)","Pumpe einschalten","3","",0,0,0,2
+"Pumpe_Fuellst_MIN","BOOL","IX(0,0)","Füllstand Pumpenschacht unterschritten","1","",0,0,0,1
+"Filter_Fuellst_MIN","BOOL","IX(0,1)","Füllstand Filtergraben unterschritten","2","",0,0,0,1
+"Pumpensteuerung_P0","BOOL","","","0","",0,0,1,514
+"Pumpe_Zeit_EIN_Letzte","INT","FINT(10)","Letzte Einschaltzeit der Pumpe","10","",0,0,0,19
+"Pumpe_Zeit_AUS_Letzte","INT","FINT(12)","Letzte Auschaltzeit der Pumpe","11","",0,0,0,19
+"Pumpe_Zeit_Verh_Letzte","INT","FINT(14)","Letzte Einschaltdauer der Pumpe in %","12","",0,0,0,19
+"Pumpe_Zeit_Verh_Mittel","INT","FINT(16)","Einschaltverhältnis gemittelt in %","13","",0,0,0,19
+"Pumpensteuerung_P1","BOOL","","","0","",0,0,1,66050
+"Pumpensteuerung_P2","BOOL","","","0","",0,0,1,131586
+"Pumpensteuerung_P3","BOOL","","","0","",0,0,1,197122
+"Teich_vorn_unten_Temp","INT","IINT(8)","Temperatur Schwimmbereich vorn unten","6","",0,0,0,1
+"Pumpensteuerung_P4","BOOL","","","0","",0,0,1,262658
+"Pumpe_Fuellst_MIN_Stoer","BOOL","FX(0,1)","Füllstandssensor Pumpenschacht gestört","14","",0,0,0,2
+"Filter_Fuellst_MIN_Stoer","BOOL","FX(0,2)","Füllstandssensor Filtergraben gestört","15","",0,0,0,2
+"Pumpensteuerung_P5","BOOL","","","0","",0,0,1,328194
+"Pumpensteuerung_P6","BOOL","","","0","",0,0,1,393730
+"Pumpensteuerung_P7","BOOL","","","0","",0,0,1,459266
+"Pumpensteuerung_P8","BOOL","","","0","",0,0,1,524802
+"Pumpensteuerung_P9","BOOL","","","0","",0,0,1,590338
+"Teich_Pumpe_Temp","INT","IINT(14)","Temperatur Pumpenschacht","7","",0,0,0,1
+"time_akt","INT","FINT(18)","aktuelle Zeit seit letzter gemerkter Zeit","16","",0,0,0,19
+"Pumpensteuerung_P10","BOOL","","","0","",0,0,1,655874
+"Pumpensteuerung_P11","BOOL","","","0","",0,0,1,721410
+"Pumpensteuerung_P12","BOOL","","","0","",0,0,1,786946
+"Mindestzeit","INT","FINT(20)","Minimale Zeit für alle Pumpenaktionen","17","",0,0,0,1
+"Nachfuellzeit_max","INT","FINT(22)","Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird","18","",0,0,0,1
+"Pumpe_Standzeit_max","INT","FINT(24)","Maximale Stillstandszeit der Pumpe","19","",0,0,0,1
+"Pumpe_Laufzeit_max","INT","FINT(26)","Maximale Laufzeit der Pumpe","20","",0,0,0,1
+"Teich_Temp_max","INT","FINT(28)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
+"Teich_Temp_min","INT","FINT(30)","Teichtemperatur ab der auf heizen geschaltet wird","22","",0,0,0,1
+"Pumpe_gesperrt","BOOL","FX(0,3)","Pumpe gesperrt","23","",0,0,0,1
+}
+IniOp: 4
+OpVars {
+"Pumpe einschalten","nicht Pumpe einschalten"="|Pumpe_EIN|||"
+"Einschaltzeit merken","nicht Einschaltzeit merken"="||ARI|Pumpe_Zeit_EIN_Letzte|time_sec-time_last"
+"Ausschaltzeit merken","nicht Ausschaltzeit merken"="||ARI|Pumpe_Zeit_AUS_Letzte|time_sec - time_last"
+"Zeitverhältnis berechnen","nicht Zeitverhältnis berechnen"="||ARI|Pumpe_Zeit_Verh_Letzte|(Pumpe_Zeit_EIN_Letzte * 100) / (Pumpe_Zeit_EIN_Letzte + Pumpe_Zeit_AUS_Letzte)"
+"Zeitverhaeltnis mit Zenteln berechnen","nicht Zeitverhaeltnis mit Zenteln berechnen"="||ARI|Pumpe_Zeit_Verh_Letzte|(Pumpe_Zeit_EIN_Letzte * 10) / (Pumpe_Zeit_EIN_Letzte/10 + Pumpe_Zeit_AUS_Letzte/10)"
+"Zeitverhaeltnis mit /100 berechnen","nicht Zeitverhaeltnis mit /100 berechnen"="||ARI|Pumpe_Zeit_Verh_Letzte|Pumpe_Zeit_EIN_Letzte / (Pumpe_Zeit_EIN_Letzte/100 + Pumpe_Zeit_AUS_Letzte/100)"
+"Zeitverhältnis mitteln","nicht Zeitverhältnis mitteln"="||ARI|Pumpe_Zeit_Verh_Mittel|(Pumpe_Zeit_Verh_Mittel*4)/5 + Pumpe_Zeit_Verh_Letzte/5"
+"Zeit merken","nicht Zeit merken"="||ARI|time_last|time_sec"
+"Störung Sensor Pumpenschacht","nicht Störung Sensor Pumpenschacht"="|Pumpe_Fuellst_MIN_Stoer|||"
+"Störung Sensor Filtergraben","nicht Störung Sensor Filtergraben"="|Filter_Fuellst_MIN_Stoer|||"
+"Zeitdifferenz berechnen","nicht Zeitdifferenz berechnen"="||ARI|time_akt|time_sec-time_last"
+}
+PVars {
+"Füllstand Pumpenschacht unterschritten","nicht Füllstand Pumpenschacht unterschritten"="|Pumpe_Fuellst_MIN|||"
+"Füllstand Filtergraben unterschritten","nicht Füllstand Filtergraben unterschritten"="|Filter_Fuellst_MIN|||"
+"Mindestenstzeit vergangen","nicht Mindestenstzeit vergangen"="|Pumpensteuerung_P0|VGL|time_akt>=Mindestzeit|"
+"Einschaltzeit/10?","nicht Einschaltzeit/10?"="|Pumpensteuerung_P1|VGL|Pumpe_Zeit_EIN_Letzte>327|"
+"Zeitüberlauf","nicht Zeitüberlauf"="|Pumpensteuerung_P2|VGL|Pumpe_Zeit_EIN_Letzte<=0 or Pumpe_Zeit_AUS_Letzte<=0|"
+"Temperatur an Pumpe größer als im Teich","nicht Temperatur an Pumpe größer als im Teich"="|Pumpensteuerung_P3|VGL|(Teich_Pumpe_Temp+2) > Teich_vorn_unten_Temp|"
+"maximale Nachfüllzeit vergangen","nicht maximale Nachfüllzeit vergangen"="|Pumpensteuerung_P4|VGL|time_akt>=Nachfuellzeit_max|"
+"Temperatursensor gestört","nicht Temperatursensor gestört"="|Pumpensteuerung_P5|VGL|(Teich_Pumpe_Temp<-50) OR (Teich_vorn_unten_Temp<-50)|"
+"maximale Ausschaltzeit vergangen","nicht maximale Ausschaltzeit vergangen"="|Pumpensteuerung_P6|VGL|time_akt>=Pumpe_Standzeit_max|"
+"Einschaltzeit/100 ?","nicht Einschaltzeit/100 ?"="|Pumpensteuerung_P7|VGL|Pumpe_Zeit_EIN_Letzte>3270|"
+"maximale Einschaltzeit vergangen","nicht maximale Einschaltzeit vergangen"="|Pumpensteuerung_P8|VGL|time_akt>=Pumpe_Laufzeit_max|"
+"maximale EIN-Zeit bei Fehltemperatur vergangen","nicht maximale EIN-Zeit bei Fehltemperatur vergangen"="|Pumpensteuerung_P9|VGL|time_akt>=180|"
+"Temperatur im Teich zu gross","nicht Temperatur im Teich zu gross"="|Pumpensteuerung_P10|VGL|Teich_vorn_unten_Temp > Teich_Temp_max|"
+"Temperatur im Teich größer als an Pumpe","nicht Temperatur im Teich größer als an Pumpe"="|Pumpensteuerung_P11|VGL|(Teich_vorn_unten_Temp+2) > Teich_Pumpe_Temp|"
+"Temperatur im Teich zu klein","nicht Temperatur im Teich zu klein"="|Pumpensteuerung_P12|VGL|Teich_vorn_unten_Temp < Teich_Temp_min|"
+"Pumpe gesperrt","nicht Pumpe gesperrt"="|Pumpe_gesperrt|||"
+}
+O {
+(760,40),50,20 ,"",{10}
+(760,780),90,20 ,"",{0,10}
+(1160,230),80,40 ,"",{7,3,6}
+(760,690),70,20 ,"",{7,2}
+(1690,40),50,20 ,"",{7}
+(1160,990),50,20 ,"",{1}
+(1350,230),80,40 ,"",{7,6,4}
+(240,1630),80,20 ,"",{8}
+(690,1630),70,20 ,"",{9}
+(1540,230),80,40 ,"",{7,6,5}
+}
+P {
+(760,250),90,20 ,0
+(760,330),90,20 ,1
+(760,920),80,20 ,2
+(760,1070),90,20 ,0
+(1160,780),60,20 ,3
+(1160,850),50,20 ,4
+(760,620),90,20 ,5
+(760,180),80,20 ,2
+(540,330),90,20 ,6
+(240,1710),90,20 ,0
+(760,410),60,20 ,7
+(690,1710),90,20 ,1
+(320,330),90,20 ,8
+(1350,780),60,20 ,9
+(760,990),90,20 ,10
+(760,1370),90,20 ,5
+(760,1150),60,20 ,7
+(760,1480),90,20 ,11
+(760,480),90,20 ,12
+(540,480),90,20 ,13
+(760,1230),90,20 ,12
+(990,1230),90,20 ,13
+(760,550),90,20 ,14
+(760,1300),90,20 ,14
+(760,850),80,20 ,15
+(760,110),80,20 ,15
+}
+C {
+(570,250),50,20 ,"STOER_PS"
+(540,400),50,20 ,"STOER_FG"
+(240,1550),50,20 ,"STOER_PS"
+(690,1550),50,20 ,"STOER_FG"
+(1790,50),10,10 ,"0"
+(380,1720),10,10 ,"0"
+(830,1720),10,10 ,"0"
+(890,860),10,10 ,"0"
+}
+A {
+n(760,290);(760,330)
+n(680,940);(620,940)
+(1160,230);(1160,60)
+(760,730);(760,780)
+(1640,60);(1540,60)
+(1350,230);(1350,60)
+n(1160,780);(1160,310)
+n(1160,850);(1160,820)
+y(1210,870);(1690,870);(1690,80)
+(1160,990);(1160,890)
+y(670,270);(620,270)
+y(760,220);(760,250)
+n(680,200);(610,200);(610,130)
+y(670,350);(630,350)
+y(540,370);(540,400)
+(240,1590);(240,1630)
+(690,1590);(690,1630)
+(240,1670);(240,1710)
+(1780,60);(1740,60)
+n(330,1730);(370,1730)
+n(760,370);(760,410)
+y(150,1730);(120,1730);(120,1650);(160,1650)
+(690,1670);(690,1710)
+y(600,1730);(560,1730);(560,1650);(620,1650)
+n(780,1730);(820,1730)
+n(450,350);(410,350)
+n(320,330);(320,60);(610,60)
+y(230,350);(190,350);(190,710);(540,710)
+y(1220,800);(1290,800)
+n(1350,780);(1350,310)
+y(1410,800);(1540,800);(1540,310)
+(1540,230);(1540,60)
+(1540,60);(1350,60)
+(1350,60);(1160,60)
+(1160,60);(810,60)
+y(760,960);(760,990)
+y(850,1010);(1110,1010)
+n(760,1030);(760,1070)
+y(850,1090);(1160,1090)
+n(760,1410);(760,1450)
+n(760,1110);(760,1150)
+y(700,1170);(620,1170)
+y(670,1390);(620,1390)
+y(850,1500);(1160,1500);(1160,1090)
+(1160,1090);(1160,1030)
+n(670,1500);(620,1500);(620,1390)
+(620,1390);(620,1320)
+y(820,430);(910,430);(910,570)
+n(760,450);(760,480)
+y(670,500);(630,500)
+y(540,520);(540,710)
+(540,710);(690,710)
+y(760,660);(760,690)
+n(670,640);(320,640);(320,500)
+n(450,500);(320,500)
+(320,500);(320,370)
+y(850,1250);(900,1250)
+n(760,1190);(760,1230)
+y(990,1230);(990,800);(850,800)
+n(990,1270);(990,1450);(760,1450)
+(760,1450);(760,1480)
+n(760,520);(760,550)
+y(760,590);(760,620)
+n(850,570);(910,570)
+(910,570);(910,710);(830,710)
+n(760,1270);(760,1300)
+y(760,1340);(760,1370)
+n(670,1320);(620,1320)
+(620,1320);(620,1170)
+(620,1170);(620,940)
+(620,940);(620,800);(670,800)
+(760,820);(760,850)
+n(760,890);(760,920)
+y(840,870);(880,870)
+(760,80);(760,110)
+n(760,150);(760,180)
+y(680,130);(610,130)
+(610,130);(610,60)
+(610,60);(710,60)
+}
+}

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.266,C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Unit1.dfm=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MainUnit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.477,C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Project1.cbproj=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\ModbusTest.cbproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.624,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\open62541.c</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.848,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MRegExp.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.978,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MModbusTcpClient.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.972,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MModbusClient.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.424,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\TCPSocket.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.266,C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Unit1.h=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MainUnit.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.498,C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MModbusBlocks.cpp=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.952,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MModbusBase.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.346,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MWinSock.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.266,C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Unit1.cpp=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MainUnit.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.865,=C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Unit1.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.963,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\MModbusBlocks.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.956,C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusTest\ModbusTestPCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.768,=C:\Users\mirko\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h</Transaction>
+    <Transaction>2019.02.25 08:30:55.457,C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusUaTest\open62541.c=</Transaction>
+    <Transaction>2019.02.25 08:31:02.017,C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusUaTest\MWinSock.cpp=</Transaction>
+    <Transaction>2019.02.25 08:31:11.766,=C:\daten\annualweekendcoding\projects\Teichsteuerung\ModbusUaTest\MSocket.cpp</Transaction>
+  </Transactions>
+</BorlandProject>
