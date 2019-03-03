@@ -4,19 +4,19 @@ V1100
 "_INIT","BOOL","FX(0,0)","Initialisierungsvariable","24","",0,0,0,1281
 "Pumpensteuerung_Op0","BYTE","","aktive Operationsnummer","0","",0,0,1,259
 "time_last","INT","","gemerkte Zeit","0","",0,0,1,19
-"time_sec","INT","FINT(4)","Ticks in Sekunden als Umlaufzähler","9","",0,0,0,1
+"time_sec","INT","F(int16_t,4)","Ticks in Sekunden als Umlaufzähler","9","",0,0,0,1
 "Pumpe_EIN","BOOL","QX(0,0)","Pumpe einschalten","3","",0,0,0,2
 "Pumpe_Fuellst_MIN","BOOL","IX(0,0)","Füllstand Pumpenschacht unterschritten","1","",0,0,0,1
 "Filter_Fuellst_MIN","BOOL","IX(0,1)","Füllstand Filtergraben unterschritten","2","",0,0,0,1
 "Pumpensteuerung_P0","BOOL","","","0","",0,0,1,514
-"Pumpe_Zeit_EIN_Letzte","INT","FINT(10)","Letzte Einschaltzeit der Pumpe","10","",0,0,0,19
-"Pumpe_Zeit_AUS_Letzte","INT","FINT(12)","Letzte Auschaltzeit der Pumpe","11","",0,0,0,19
-"Pumpe_Zeit_Verh_Letzte","INT","FINT(14)","Letzte Einschaltdauer der Pumpe in %","12","",0,0,0,19
-"Pumpe_Zeit_Verh_Mittel","INT","FINT(16)","Einschaltverhältnis gemittelt in %","13","",0,0,0,19
+"Pumpe_Zeit_EIN_Letzte","INT","F(int16_t,10)","Letzte Einschaltzeit der Pumpe","10","",0,0,0,19
+"Pumpe_Zeit_AUS_Letzte","INT","F(int16_t,12)","Letzte Auschaltzeit der Pumpe","11","",0,0,0,19
+"Pumpe_Zeit_Verh_Letzte","INT","F(int16_t,14)","Letzte Einschaltdauer der Pumpe in %","12","",0,0,0,19
+"Pumpe_Zeit_Verh_Mittel","INT","F(int16_t,16)","Einschaltverhältnis gemittelt in %","13","",0,0,0,19
 "Pumpensteuerung_P1","BOOL","","","0","",0,0,1,66050
 "Pumpensteuerung_P2","BOOL","","","0","",0,0,1,131586
 "Pumpensteuerung_P3","BOOL","","","0","",0,0,1,197122
-"Teich_vorn_unten_Temp","INT","IINT(8)","Temperatur Schwimmbereich vorn unten","6","",0,0,0,1
+"Teich_vorn_unten_Temp","INT","I(int16_t,8)","Temperatur Schwimmbereich vorn unten","6","",0,0,0,1
 "Pumpensteuerung_P4","BOOL","","","0","",0,0,1,262658
 "Pumpe_Fuellst_MIN_Stoer","BOOL","FX(0,1)","Füllstandssensor Pumpenschacht gestört","14","",0,0,0,2
 "Filter_Fuellst_MIN_Stoer","BOOL","FX(0,2)","Füllstandssensor Filtergraben gestört","15","",0,0,0,2
@@ -25,17 +25,17 @@ V1100
 "Pumpensteuerung_P7","BOOL","","","0","",0,0,1,459266
 "Pumpensteuerung_P8","BOOL","","","0","",0,0,1,524802
 "Pumpensteuerung_P9","BOOL","","","0","",0,0,1,590338
-"Teich_Pumpe_Temp","INT","IINT(14)","Temperatur Pumpenschacht","7","",0,0,0,1
-"time_akt","INT","FINT(18)","aktuelle Zeit seit letzter gemerkter Zeit","16","",0,0,0,19
+"Teich_Pumpe_Temp","INT","I(int16_t,14)","Temperatur Pumpenschacht","7","",0,0,0,1
+"time_akt","INT","F(int16_t,18)","aktuelle Zeit seit letzter gemerkter Zeit","16","",0,0,0,19
 "Pumpensteuerung_P10","BOOL","","","0","",0,0,1,655874
 "Pumpensteuerung_P11","BOOL","","","0","",0,0,1,721410
 "Pumpensteuerung_P12","BOOL","","","0","",0,0,1,786946
-"Mindestzeit","INT","FINT(20)","Minimale Zeit für alle Pumpenaktionen","17","",0,0,0,1
-"Nachfuellzeit_max","INT","FINT(22)","Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird","18","",0,0,0,1
-"Pumpe_Standzeit_max","INT","FINT(24)","Maximale Stillstandszeit der Pumpe","19","",0,0,0,1
-"Pumpe_Laufzeit_max","INT","FINT(26)","Maximale Laufzeit der Pumpe","20","",0,0,0,1
-"Teich_Temp_max","INT","FINT(28)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
-"Teich_Temp_min","INT","FINT(30)","Teichtemperatur ab der auf heizen geschaltet wird","22","",0,0,0,1
+"Mindestzeit","INT","F(int16_t,20)","Minimale Zeit für alle Pumpenaktionen","17","",0,0,0,1
+"Nachfuellzeit_max","INT","F(int16_t,22)","Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird","18","",0,0,0,1
+"Pumpe_Standzeit_max","INT","F(int16_t,24)","Maximale Stillstandszeit der Pumpe","19","",0,0,0,1
+"Pumpe_Laufzeit_max","INT","F(int16_t,26)","Maximale Laufzeit der Pumpe","20","",0,0,0,1
+"Teich_Temp_max","INT","F(int16_t,28)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
+"Teich_Temp_min","INT","F(int16_t,30)","Teichtemperatur ab der auf heizen geschaltet wird","22","",0,0,0,1
 "Pumpe_gesperrt","BOOL","FX(0,3)","Pumpe gesperrt","23","",0,0,0,1
 }
 IniOp: 4

@@ -206,7 +206,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
       case MB_FC_WRITE_REGISTER:  // 06 Write Holding Register
           if ((Start*2+1)<PLC_F_SIZE)
           {
-            FREF(uint16_t,Start*2) = word(ByteArray[MB_TCP_REGISTER_NUMBER],ByteArray[MB_TCP_REGISTER_NUMBER+1]);
+            F(uint16_t,Start*2) = word(ByteArray[MB_TCP_REGISTER_NUMBER],ByteArray[MB_TCP_REGISTER_NUMBER+1]);
             ByteArray[5] = 6; //Number of bytes after this one.
             MessageLength = 12;
             client.write((const uint8_t *)ByteArray,MessageLength);
@@ -220,7 +220,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
                 Serial.print("Write Holding Register: ");
                 Serial.print(Start);
                 Serial.print("=");
-                Serial.println((Start*2+1<PLC_F_SIZE) ? FREF(uint16_t,Start*2) : -1);
+                Serial.println((Start*2+1<PLC_F_SIZE) ? F(uint16_t,Start*2) : -1);
             #endif
           }
           else 
@@ -237,7 +237,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
           {
             for(int i = 0; i < WordDataLength; i++)
             {
-              FREF(uint16_t,(Start+i)*2) =  word(ByteArray[ 13 + i * 2],ByteArray[14 + i * 2]);
+              F(uint16_t,(Start+i)*2) =  word(ByteArray[ 13 + i * 2],ByteArray[14 + i * 2]);
             }
             MessageLength = 12;
             client.write((const uint8_t *)ByteArray,MessageLength);

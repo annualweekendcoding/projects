@@ -130,17 +130,17 @@ void read_temperatures()
       if (isEqual(tempDeviceAddress,Teich_vorn_oben_Temp_Adress)) 
       {
         ort="Teich_vorn_oben";
-        IINT(6)=tempC*10; // Zuweisung im TERANiS-Bereich
+        I(int16_t,6)=tempC*10; // Zuweisung im TERANiS-Bereich
       }
       else if (isEqual(tempDeviceAddress,Teich_vorn_unten_Temp_Adress)) 
       {
         ort="Teich_vorn_unten";
-        IINT(8)=tempC*10; // Zuweisung im TERANiS-Bereich
+        I(int16_t,8)=tempC*10; // Zuweisung im TERANiS-Bereich
       }
       else if (isEqual(tempDeviceAddress,Solar_Ausgang_Temp_Adress)) 
       {
         ort="Solar_Ausgang";
-        IINT(10)=tempC*10; // Zuweisung im TERANiS-Bereich
+        I(int16_t,10)=tempC*10; // Zuweisung im TERANiS-Bereich
       }
       // build Telnet Message
       char msg[50];

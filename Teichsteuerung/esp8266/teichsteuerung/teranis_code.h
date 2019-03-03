@@ -7,22 +7,22 @@ void akttimes ()
   /* VAR_TEMP */
   int64_t l = 0;
   int16_t i = 0;
-  l = IREF(int64_t,20) - FREF(int64_t,60);
+  l = I(int64_t,20) - F(int64_t,60);
   if (l > 0 && l < 10000)
   {
-    FINT(2) = ((int16_t) (FINT(2) + l));
+    F(int16_t,2) = ((int16_t) (F(int16_t,2) + l));
   }
   /* Millisekunden Ticker */
-  FREF(int64_t,60) = IREF(int64_t,20);
-  i = FINT(2) - FINT(6);
+  F(int64_t,60) = I(int64_t,20);
+  i = F(int16_t,2) - F(int16_t,6);
   if (i < 0)
   {
-    FINT(6) = FINT(2);
+    F(int16_t,6) = F(int16_t,2);
   }
   else if (i > 1000)
   {
-    FINT(4) = ((int16_t) (FINT(4) + i / 1000));
-    FINT(6) = ((int16_t) (FINT(6) + (i / 1000) * 1000));
+    F(int16_t,4) = ((int16_t) (F(int16_t,4) + i / 1000));
+    F(int16_t,6) = ((int16_t) (F(int16_t,6) + (i / 1000) * 1000));
   }
 }
 // END_BLOCK
@@ -83,19 +83,19 @@ void Pumpensteuerung (
   }
   /* Initialisierung der Operationsvariablen */
   /* Berechnung der nicht binären Prozeßvariablen */
-  (*inst).Pumpensteuerung_P0 = FINT(18) >= FINT(20);
-  (*inst).Pumpensteuerung_P1 = FINT(10) > 327;
-  (*inst).Pumpensteuerung_P2 = FINT(10) <= 0 || FINT(12) <= 0;
-  (*inst).Pumpensteuerung_P3 = (IINT(14) + 2) > IINT(8);
-  (*inst).Pumpensteuerung_P4 = FINT(18) >= FINT(22);
-  (*inst).Pumpensteuerung_P5 = (IINT(14) < ((int16_t) (-50))) || (IINT(8) < ((int16_t) (-50)));
-  (*inst).Pumpensteuerung_P6 = FINT(18) >= FINT(24);
-  (*inst).Pumpensteuerung_P7 = FINT(10) > 3270;
-  (*inst).Pumpensteuerung_P8 = FINT(18) >= FINT(26);
-  (*inst).Pumpensteuerung_P9 = FINT(18) >= 180;
-  (*inst).Pumpensteuerung_P10 = IINT(8) > FINT(28);
-  (*inst).Pumpensteuerung_P11 = (IINT(8) + 2) > IINT(14);
-  (*inst).Pumpensteuerung_P12 = IINT(8) < FINT(30);
+  (*inst).Pumpensteuerung_P0 = F(int16_t,18) >= F(int16_t,20);
+  (*inst).Pumpensteuerung_P1 = F(int16_t,10) > 327;
+  (*inst).Pumpensteuerung_P2 = F(int16_t,10) <= 0 || F(int16_t,12) <= 0;
+  (*inst).Pumpensteuerung_P3 = (I(int16_t,14) + 2) > I(int16_t,8);
+  (*inst).Pumpensteuerung_P4 = F(int16_t,18) >= F(int16_t,22);
+  (*inst).Pumpensteuerung_P5 = (I(int16_t,14) < ((int16_t) (-50))) || (I(int16_t,8) < ((int16_t) (-50)));
+  (*inst).Pumpensteuerung_P6 = F(int16_t,18) >= F(int16_t,24);
+  (*inst).Pumpensteuerung_P7 = F(int16_t,10) > 3270;
+  (*inst).Pumpensteuerung_P8 = F(int16_t,18) >= F(int16_t,26);
+  (*inst).Pumpensteuerung_P9 = F(int16_t,18) >= 180;
+  (*inst).Pumpensteuerung_P10 = I(int16_t,8) > F(int16_t,28);
+  (*inst).Pumpensteuerung_P11 = (I(int16_t,8) + 2) > I(int16_t,14);
+  (*inst).Pumpensteuerung_P12 = I(int16_t,8) < F(int16_t,30);
   if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (0)))
   {
     if ((!FX(0,3) && (*inst).Pumpensteuerung_P0 && IX(0,0)))
@@ -229,35 +229,35 @@ void Pumpensteuerung (
   _OV7 = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (3))) || ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (4))) || _OV6;
   if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (5))))
   {
-    FINT(10) = FINT(4) - (*inst).time_last;
+    F(int16_t,10) = F(int16_t,4) - (*inst).time_last;
   }
   if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (3))))
   {
-    FINT(12) = FINT(4) - (*inst).time_last;
+    F(int16_t,12) = F(int16_t,4) - (*inst).time_last;
   }
   if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (2))))
   {
-    FINT(14) = ((int16_t) ((FINT(10) * 100) / (FINT(10) + FINT(12))));
+    F(int16_t,14) = ((int16_t) ((F(int16_t,10) * 100) / (F(int16_t,10) + F(int16_t,12))));
   }
   if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (6))))
   {
-    FINT(14) = ((int16_t) ((FINT(10) * 10) / (FINT(10) / 10 + FINT(12) / 10)));
+    F(int16_t,14) = ((int16_t) ((F(int16_t,10) * 10) / (F(int16_t,10) / 10 + F(int16_t,12) / 10)));
   }
   if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (9))))
   {
-    FINT(14) = ((int16_t) (FINT(10) / (FINT(10) / 100 + FINT(12) / 100)));
+    F(int16_t,14) = ((int16_t) (F(int16_t,10) / (F(int16_t,10) / 100 + F(int16_t,12) / 100)));
   }
   if (_OV6)
   {
-    FINT(16) = ((int16_t) ((FINT(16) * 4) / 5 + FINT(14) / 5));
+    F(int16_t,16) = ((int16_t) ((F(int16_t,16) * 4) / 5 + F(int16_t,14) / 5));
   }
   if (_OV7)
   {
-    (*inst).time_last = FINT(4);
+    (*inst).time_last = F(int16_t,4);
   }
   if (_OV10)
   {
-    FINT(18) = FINT(4) - (*inst).time_last;
+    F(int16_t,18) = F(int16_t,4) - (*inst).time_last;
   }
   /* Ausgabe Sonderfunktionen und Timeraufrufe */
   /* Einschaltzeit merken */
@@ -349,11 +349,11 @@ void Temperatursensoren (
   _OV3 = ((*inst).Temperatursensoren_Op0 == ((uint8_t) (1))) || ((*inst).Temperatursensoren_Op0 == ((uint8_t) (3)));
   if (((*inst).Temperatursensoren_Op0 == ((uint8_t) (0))))
   {
-    FINT(8) = FINT(2);
+    F(int16_t,8) = F(int16_t,2);
   }
   if (_OV3)
   {
-    (*inst).diff = FINT(2) - FINT(8);
+    (*inst).diff = F(int16_t,2) - F(int16_t,8);
   }
   /* Ausgabe Sonderfunktionen und Timeraufrufe */
   /* Zeit merken */

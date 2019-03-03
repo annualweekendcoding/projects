@@ -25,25 +25,25 @@ VAR
 END_VAR
 VAR_EXTERNAL
   _INIT AT %FX(0,0) : BOOL; // Initialisierungsvariable
-  time_sec AT %FINT(4) : INT; // Ticks in Sekunden als Umlaufzähler
+  time_sec AT %F(int16_t,4) : INT; // Ticks in Sekunden als Umlaufzähler
   Pumpe_EIN AT %QX(0,0) : BOOL; // Pumpe einschalten
   Pumpe_Fuellst_MIN AT %IX(0,0) : BOOL; // Füllstand Pumpenschacht unterschritten
   Filter_Fuellst_MIN AT %IX(0,1) : BOOL; // Füllstand Filtergraben unterschritten
-  Pumpe_Zeit_EIN_Letzte AT %FINT(10) : INT; // Letzte Einschaltzeit der Pumpe
-  Pumpe_Zeit_AUS_Letzte AT %FINT(12) : INT; // Letzte Auschaltzeit der Pumpe
-  Pumpe_Zeit_Verh_Letzte AT %FINT(14) : INT; // Letzte Einschaltdauer der Pumpe in %
-  Pumpe_Zeit_Verh_Mittel AT %FINT(16) : INT; // Einschaltverhältnis gemittelt in %
-  Teich_vorn_unten_Temp AT %IINT(8) : INT; // Temperatur Schwimmbereich vorn unten
+  Pumpe_Zeit_EIN_Letzte AT %F(int16_t,10) : INT; // Letzte Einschaltzeit der Pumpe
+  Pumpe_Zeit_AUS_Letzte AT %F(int16_t,12) : INT; // Letzte Auschaltzeit der Pumpe
+  Pumpe_Zeit_Verh_Letzte AT %F(int16_t,14) : INT; // Letzte Einschaltdauer der Pumpe in %
+  Pumpe_Zeit_Verh_Mittel AT %F(int16_t,16) : INT; // Einschaltverhältnis gemittelt in %
+  Teich_vorn_unten_Temp AT %I(int16_t,8) : INT; // Temperatur Schwimmbereich vorn unten
   Pumpe_Fuellst_MIN_Stoer AT %FX(0,1) : BOOL; // Füllstandssensor Pumpenschacht gestört
   Filter_Fuellst_MIN_Stoer AT %FX(0,2) : BOOL; // Füllstandssensor Filtergraben gestört
-  Teich_Pumpe_Temp AT %IINT(14) : INT; // Temperatur Pumpenschacht
-  time_akt AT %FINT(18) : INT; // aktuelle Zeit seit letzter gemerkter Zeit
-  Mindestzeit AT %FINT(20) : INT; // Minimale Zeit für alle Pumpenaktionen
-  Nachfuellzeit_max AT %FINT(22) : INT; // Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird
-  Pumpe_Standzeit_max AT %FINT(24) : INT; // Maximale Stillstandszeit der Pumpe
-  Pumpe_Laufzeit_max AT %FINT(26) : INT; // Maximale Laufzeit der Pumpe
-  Teich_Temp_max AT %FINT(28) : INT; // Teichtemperatur ab der auf kühlen geschaltet wird
-  Teich_Temp_min AT %FINT(30) : INT; // Teichtemperatur ab der auf heizen geschaltet wird
+  Teich_Pumpe_Temp AT %I(int16_t,14) : INT; // Temperatur Pumpenschacht
+  time_akt AT %F(int16_t,18) : INT; // aktuelle Zeit seit letzter gemerkter Zeit
+  Mindestzeit AT %F(int16_t,20) : INT; // Minimale Zeit für alle Pumpenaktionen
+  Nachfuellzeit_max AT %F(int16_t,22) : INT; // Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird
+  Pumpe_Standzeit_max AT %F(int16_t,24) : INT; // Maximale Stillstandszeit der Pumpe
+  Pumpe_Laufzeit_max AT %F(int16_t,26) : INT; // Maximale Laufzeit der Pumpe
+  Teich_Temp_max AT %F(int16_t,28) : INT; // Teichtemperatur ab der auf kühlen geschaltet wird
+  Teich_Temp_min AT %F(int16_t,30) : INT; // Teichtemperatur ab der auf heizen geschaltet wird
   Pumpe_gesperrt AT %FX(0,3) : BOOL; // Pumpe gesperrt
 END_VAR
 VAR_TEMP

@@ -5,10 +5,10 @@ V1100
 "Temperatursensoren_Op0","BYTE","","","0","",0,0,1,259
 "Temperaturen_lesen","BOOL","QX(0,1)","Temperaturen vom OneWire einlesen","30","",0,0,0,2
 "Temperaturen_einschalten","BOOL","QX(0,6)","Spannung für Temperatursensoren einschalten","31","",0,0,0,2
-"time_ms","INT","FINT(2)","Ticks in Sekunden als Umlaufzähler","27","",0,0,0,1
+"time_ms","INT","F(int16_t,2)","Ticks in Sekunden als Umlaufzähler","27","",0,0,0,1
 "Temperatursensoren_P0","BOOL","","","0","",0,0,1,514
 "Temperatursensoren_P1","BOOL","","","0","",0,0,1,66050
-"zeit_merk","INT","FINT(8)","gemerkte Zeit","32","",0,0,1,19
+"zeit_merk","INT","F(int16_t,8)","gemerkte Zeit","32","",0,0,1,19
 "diff","INT","","","0","",0,0,1,19
 }
 IniOp: 0

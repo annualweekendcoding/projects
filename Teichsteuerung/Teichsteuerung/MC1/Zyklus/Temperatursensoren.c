@@ -74,11 +74,11 @@ void Temperatursensoren (
   _OV3 = ((*inst).Temperatursensoren_Op0 == ((uint8_t) (1))) || ((*inst).Temperatursensoren_Op0 == ((uint8_t) (3)));
   if (((*inst).Temperatursensoren_Op0 == ((uint8_t) (0))))
   {
-    FINT(8) = FINT(2);
+    F(int16_t,8) = F(int16_t,2);
   }
   if (_OV3)
   {
-    (*inst).diff = FINT(2) - FINT(8);
+    (*inst).diff = F(int16_t,2) - F(int16_t,8);
   }
   /* Ausgabe Sonderfunktionen und Timeraufrufe */
   /* Zeit merken */

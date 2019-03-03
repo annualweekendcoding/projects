@@ -21,3 +21,5 @@
 wifi_secrets.h
 /Teichsteuerung/open62541-open62541-6249bb2
 /Teichsteuerung/windows/__history
+*.tds
+*.dsk

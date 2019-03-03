@@ -5,6 +5,11 @@ extern "C"{
   #include "teranis.h" 
 };
 
+// Hilfsdefinitionen zum Zugriff auf TERANiS Variablen
+//#define IINT(idx) I(int16_t,idx)
+//#define FINT(idx) F(int16_t,idx)
+//#define FDINT(idx) F(int32_t,idx)
+
 ModbusTCPSlave modbusTCPSlave; 
 
 void setup(void)
@@ -31,7 +36,7 @@ void loop(void)
   if (loop_ota()) return;
 
   // now übertragen
-  IREF(int64_t,20) = millis();
+  I(int64_t,20) = millis();
 
   loop_teranis();
 
@@ -39,7 +44,7 @@ void loop(void)
   if (QX(0,1)) read_temperatures();
   if (QX(0,1))
   {
-    Serial.println(FINT(4));
+    Serial.println(F(int16_t,4));
   }  
   modbusTCPSlave.Run();
   Telnet();
