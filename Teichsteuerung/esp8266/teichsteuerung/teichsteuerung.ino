@@ -1,14 +1,6 @@
 #include "ModbusTCPSlave.h"
 #include "temperature.h"
-
-extern "C"{ 
-  #include "teranis.h" 
-};
-
-// Hilfsdefinitionen zum Zugriff auf TERANiS Variablen
-//#define IINT(idx) I(int16_t,idx)
-//#define FINT(idx) F(int16_t,idx)
-//#define FDINT(idx) F(int32_t,idx)
+#include "teranis.h" 
 
 ModbusTCPSlave modbusTCPSlave; 
 

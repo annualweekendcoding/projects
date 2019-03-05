@@ -12,8 +12,19 @@
   uint8_t Flags[PLC_F_SIZE];
 #endif
 
+#if PLC_R_SIZE>0
+  uint8_t RFlags[PLC_F_SIZE];
+#endif
+
 // Von TERANiS generierten Code einbinden
-#include "teranis_code.h"
+#ifdef __cplusplus
+  namespace teranis {
+    #include "teranis_code.h"
+  };
+  using teranis::Zyklus;
+#else
+  #include "teranis_code.h"
+#endif
 
 // Globale Instanz, da teranis_main ein Funktionsblock ist
 struct Zyklus I_Zyklus;

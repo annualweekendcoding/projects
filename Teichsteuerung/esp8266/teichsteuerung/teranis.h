@@ -6,7 +6,8 @@
 // Define the size in Bytes for different PLC memory types
 #define PLC_I_SIZE 30 // Input Bytes
 #define PLC_Q_SIZE 1 // Output Bytes
-#define PLC_F_SIZE 1000 // Flags Bytes
+#define PLC_F_SIZE 68 // Flags Bytes
+#define PLC_R_SIZE 10 // Remanent Flags Bytes
 
 typedef struct
 {
@@ -21,7 +22,22 @@ typedef struct
 } T8Bits;
 
 // Macro zum casten eines Typs in ein Byte-Array
-#define TREF(typ,arr,idx) (*((typ*)(&(arr[idx]))))
+#ifdef __cplusplus
+  // Templatefunktion zum Ermitteln eines Zeigers mit definiertem Typ in ein Variablenfeld
+  // Dabei wird auf Überschreitung des Index getestet und zur Übersetzungszeit Fehler gemeldet
+  template <typename T,const unsigned S,const unsigned I>
+  T* TeArrayElement(uint8_t *A)
+  {
+    static_assert(S>=(I+sizeof(T)),"index and size of type exceeds size of array");
+    return ((T*)(&(A[I])));
+  }; 
+
+  // Macrodefinition
+  #define TREF(typ,arr,idx) (*TeArrayElement<typ,sizeof(Flags),idx>(Flags))   
+#else
+  // Die Standard-C Variante ohne Indexüberprüfung
+  #define TREF(typ,arr,idx) (*((typ*)(&(arr[idx]))))
+#endif
 
 // Macro zum Zugriff auf ein Bit in einem Byte-Array
 #define XREF(arr,idx,bitnr) TREF(T8Bits,arr,idx).x##bitnr
@@ -40,9 +56,15 @@ typedef struct
 
 #if PLC_F_SIZE>0
   extern uint8_t Flags[PLC_F_SIZE];
-  
+  #undef F
   #define F(typ,idx) TREF(typ,Flags,idx)
   #define FX(idx,bitnr) XREF(Flags,idx,bitnr)
+#endif
+
+#if PLC_R_SIZE>0
+  extern uint8_t RFlags[PLC_F_SIZE];
+  #define R(typ,idx) TREF(typ,RFlags,idx)
+  #define RX(idx,bitnr) XREF(RFlags,idx,bitnr)
 #endif
 
 void setup_teranis();

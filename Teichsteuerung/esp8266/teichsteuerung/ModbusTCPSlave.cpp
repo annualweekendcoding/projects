@@ -4,11 +4,8 @@
 */
 #include <Arduino.h>
 #include "ModbusTCPSlave.h"
-
 // Register kommen von TERANiS
-extern "C"{ 
-  #include "teranis.h" 
-};
+#include "teranis.h" 
 
 #define MB_PORT 502  
 
@@ -151,6 +148,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
           {
             for(int i = 0; i < WordDataLength; i++)
             {
+              // Register von Flags umspeichern, Bytes dabei drehen
               ByteArray[ 9 + i * 2] = Flags[(Start + i)*2 +1];
               ByteArray[10 + i * 2] = Flags[(Start + i)*2];
             }
@@ -182,6 +180,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
           {
             for(int i = 0; i < WordDataLength; i++)
             {
+              // Register vom Input umspeichern, Bytes dabei drehen
               ByteArray[ 9 + i * 2] = Inputs[(Start + i)*2 +1];
               ByteArray[10 + i * 2] = Inputs[(Start + i)*2];
             }
@@ -206,7 +205,9 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
       case MB_FC_WRITE_REGISTER:  // 06 Write Holding Register
           if ((Start*2+1)<PLC_F_SIZE)
           {
-            F(uint16_t,Start*2) = word(ByteArray[MB_TCP_REGISTER_NUMBER],ByteArray[MB_TCP_REGISTER_NUMBER+1]);
+            // Register in Flags umspeichern, Bytes dabei drehen
+            Flags[Start*2] = ByteArray[MB_TCP_REGISTER_NUMBER+1]; 
+            Flags[Start*2+1] = ByteArray[MB_TCP_REGISTER_NUMBER]; 
             ByteArray[5] = 6; //Number of bytes after this one.
             MessageLength = 12;
             client.write((const uint8_t *)ByteArray,MessageLength);
@@ -237,7 +238,9 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
           {
             for(int i = 0; i < WordDataLength; i++)
             {
-              F(uint16_t,(Start+i)*2) =  word(ByteArray[ 13 + i * 2],ByteArray[14 + i * 2]);
+              // Register in Flags umspeichern, Bytes dabei drehen
+              Flags[Start*2] = ByteArray[14 + i * 2]; 
+              Flags[Start*2+1] = ByteArray[ 13 + i * 2]; 
             }
             MessageLength = 12;
             client.write((const uint8_t *)ByteArray,MessageLength);

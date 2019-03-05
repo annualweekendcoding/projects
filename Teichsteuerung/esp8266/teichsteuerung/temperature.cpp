@@ -1,11 +1,7 @@
 //#include <Base64.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
-extern "C" 
-{
-  #include "teranis.h"
-}
+#include "teranis.h"
 
 // Data wire is plugged into port D5 on Wemos D1 mini
 #define ONE_WIRE_BUS 14
