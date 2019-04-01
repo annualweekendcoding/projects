@@ -39,7 +39,7 @@ struct Pumpensteuerung {
   uint8_t Pumpensteuerung_Op0;
   /* gemerkte Zeit*/
   int16_t time_last;
-  /* Mindestenstzeit vergangen*/
+  /* Mindestzeit vergangen*/
   bool Pumpensteuerung_P0;
   /* Einschaltzeit/10?*/
   bool Pumpensteuerung_P1;
@@ -83,20 +83,20 @@ void Pumpensteuerung (
   }
   /* Initialisierung der Operationsvariablen */
   /* Berechnung der nicht binären Prozeßvariablen */
-  (*inst).Pumpensteuerung_P0 = F(int16_t,18) >= F(int16_t,20);
+  (*inst).Pumpensteuerung_P0 = F(int16_t,18) >= R(int16_t,0);
   (*inst).Pumpensteuerung_P1 = F(int16_t,10) > 327;
   (*inst).Pumpensteuerung_P2 = F(int16_t,10) <= 0 || F(int16_t,12) <= 0;
   (*inst).Pumpensteuerung_P3 = (I(int16_t,14) + 2) > I(int16_t,8);
-  (*inst).Pumpensteuerung_P4 = F(int16_t,18) >= F(int16_t,22);
+  (*inst).Pumpensteuerung_P4 = F(int16_t,18) >= R(int16_t,2);
   (*inst).Pumpensteuerung_P5 = (I(int16_t,14) < ((int16_t) (-50))) || (I(int16_t,8) < ((int16_t) (-50)));
-  (*inst).Pumpensteuerung_P6 = F(int16_t,18) >= F(int16_t,24);
+  (*inst).Pumpensteuerung_P6 = F(int16_t,18) >= R(int16_t,4);
   (*inst).Pumpensteuerung_P7 = F(int16_t,10) > 3270;
-  (*inst).Pumpensteuerung_P8 = F(int16_t,18) >= F(int16_t,26);
+  (*inst).Pumpensteuerung_P8 = F(int16_t,18) >= R(int16_t,6);
   (*inst).Pumpensteuerung_P9 = F(int16_t,18) >= 180;
-  (*inst).Pumpensteuerung_P10 = I(int16_t,8) > F(int16_t,28);
+  (*inst).Pumpensteuerung_P10 = I(int16_t,8) > R(int16_t,8);
   (*inst).Pumpensteuerung_P11 = (I(int16_t,8) + 2) > I(int16_t,14);
-  (*inst).Pumpensteuerung_P12 = I(int16_t,8) < F(int16_t,30);
-  if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (0)))
+  (*inst).Pumpensteuerung_P12 = I(int16_t,8) < R(int16_t,10);
+  if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 0)
   {
     if ((!FX(0,3) && (*inst).Pumpensteuerung_P0 && IX(0,0)))
     {
@@ -115,7 +115,7 @@ void Pumpensteuerung (
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (3));
     }
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (1)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 1)
   {
     if (FX(0,3))
     {
@@ -128,19 +128,19 @@ void Pumpensteuerung (
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (5));
     }
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (2)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 2)
   {
     (*inst).Pumpensteuerung_Op0 = ((uint8_t) (0));
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (3)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 3)
   {
     (*inst).Pumpensteuerung_Op0 = ((uint8_t) (1));
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (4)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 4)
   {
     (*inst).Pumpensteuerung_Op0 = ((uint8_t) (0));
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (5)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 5)
   {
     if ((*inst).Pumpensteuerung_P2)
     {
@@ -159,25 +159,25 @@ void Pumpensteuerung (
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (9));
     }
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (6)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 6)
   {
     (*inst).Pumpensteuerung_Op0 = ((uint8_t) (0));
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (7)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 7)
   {
     if (!IX(0,0))
     {
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (4));
     }
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (8)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 8)
   {
     if (!IX(0,1))
     {
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (4));
     }
   }
-  else if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (9)))
+  else if (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 9)
   {
     (*inst).Pumpensteuerung_Op0 = ((uint8_t) (0));
   }
@@ -215,35 +215,35 @@ void Pumpensteuerung (
   /* Initialisierung wenn keine Operation gesetzt ist */
   /* Zuweisung der Operationsvariablen */
   /* Pumpe einschalten */
-  QX(0,0) = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (1)));
+  QX(0,0) = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 1);
   /* Störung Sensor Pumpenschacht */
-  FX(0,1) = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (7)));
+  FX(0,1) = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 7);
   /* Störung Sensor Filtergraben */
-  FX(0,2) = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (8)));
+  FX(0,2) = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 8);
   /* Zeitdifferenz berechnen */
-  _OV10 = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (0))) || ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (1)));
+  _OV10 = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 0) || (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 1);
   /* Zeitverhältnis mitteln */
-  _OV6 = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (2))) || ((*inst).Pumpensteuerung_Op0 == ((uint8_t)
-   (6))) || ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (9)));
+  _OV6 = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 2) || (((int64_t) ((*inst).Pumpensteuerung_Op0))
+   == 6) || (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 9);
   /* Zeit merken */
-  _OV7 = ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (3))) || ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (4))) || _OV6;
-  if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (5))))
+  _OV7 = (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 3) || (((int64_t) ((*inst).Pumpensteuerung_Op0)) == 4) || _OV6;
+  if ((((int64_t) ((*inst).Pumpensteuerung_Op0)) == 5))
   {
     F(int16_t,10) = F(int16_t,4) - (*inst).time_last;
   }
-  if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (3))))
+  if ((((int64_t) ((*inst).Pumpensteuerung_Op0)) == 3))
   {
     F(int16_t,12) = F(int16_t,4) - (*inst).time_last;
   }
-  if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (2))))
+  if ((((int64_t) ((*inst).Pumpensteuerung_Op0)) == 2))
   {
     F(int16_t,14) = ((int16_t) ((F(int16_t,10) * 100) / (F(int16_t,10) + F(int16_t,12))));
   }
-  if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (6))))
+  if ((((int64_t) ((*inst).Pumpensteuerung_Op0)) == 6))
   {
     F(int16_t,14) = ((int16_t) ((F(int16_t,10) * 10) / (F(int16_t,10) / 10 + F(int16_t,12) / 10)));
   }
-  if (((*inst).Pumpensteuerung_Op0 == ((uint8_t) (9))))
+  if ((((int64_t) ((*inst).Pumpensteuerung_Op0)) == 9))
   {
     F(int16_t,14) = ((int16_t) (F(int16_t,10) / (F(int16_t,10) / 100 + F(int16_t,12) / 100)));
   }

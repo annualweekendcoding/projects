@@ -6,34 +6,36 @@
 // Define the size in Bytes for different PLC memory types
 #define PLC_I_SIZE 30 // Input Bytes
 #define PLC_Q_SIZE 1 // Output Bytes
-#define PLC_F_SIZE 68 // Flags Bytes
-#define PLC_R_SIZE 10 // Remanent Flags Bytes
+#define PLC_F_SIZE 256 // Flags Bytes
+#define PLC_R_SIZE 256 // Remanent Flags Bytes
 
 typedef struct
 {
-  unsigned x0 : 1;
-  unsigned x1 : 1;
-  unsigned x2 : 1;
-  unsigned x3 : 1;
-  unsigned x4 : 1;
-  unsigned x5 : 1;
-  unsigned x6 : 1;
-  unsigned x7 : 1;
+  uint8_t x0 : 1;
+  uint8_t x1 : 1;
+  uint8_t x2 : 1;
+  uint8_t x3 : 1;
+  uint8_t x4 : 1;
+  uint8_t x5 : 1;
+  uint8_t x6 : 1;
+  uint8_t x7 : 1;
 } T8Bits;
 
 // Macro zum casten eines Typs in ein Byte-Array
 #ifdef __cplusplus
   // Templatefunktion zum Ermitteln eines Zeigers mit definiertem Typ in ein Variablenfeld
   // Dabei wird auf Überschreitung des Index getestet und zur Übersetzungszeit Fehler gemeldet
+  // Leider ist es nicht möglich auszugeben, welches Array gemeint ist.
   template <typename T,const unsigned S,const unsigned I>
   T* TeArrayElement(uint8_t *A)
   {
-    static_assert(S>=(I+sizeof(T)),"index and size of type exceeds size of array");
+    static_assert(S>=I, "index exceeds size of array");
+    static_assert(S>=(I+sizeof(T)), "index and size of type exceeds size of array");
     return ((T*)(&(A[I])));
   }; 
 
   // Macrodefinition
-  #define TREF(typ,arr,idx) (*TeArrayElement<typ,sizeof(Flags),idx>(Flags))   
+  #define TREF(typ,arr,idx) (*TeArrayElement<typ,sizeof(arr),idx>(arr))   
 #else
   // Die Standard-C Variante ohne Indexüberprüfung
   #define TREF(typ,arr,idx) (*((typ*)(&(arr[idx]))))

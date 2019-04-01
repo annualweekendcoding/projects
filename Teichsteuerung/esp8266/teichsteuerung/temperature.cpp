@@ -138,10 +138,35 @@ void read_temperatures()
         ort="Solar_Ausgang";
         I(int16_t,10)=tempC*10; // Zuweisung im TERANiS-Bereich
       }
+      else if (isEqual(tempDeviceAddress,Teich_Luft_Temp_Adress)) 
+      {
+        ort="Luft";
+        I(int16_t,12)=tempC*10; // Zuweisung im TERANiS-Bereich
+      }
+      else if (isEqual(tempDeviceAddress,Pumpe_Temp_Adress)) 
+      {
+        ort="Pumpe";
+        I(int16_t,14)=tempC*10; // Zuweisung im TERANiS-Bereich
+      }
+      else if (isEqual(tempDeviceAddress,Filter_Temp_Adress)) 
+      {
+        ort="Filter";
+        I(int16_t,16)=tempC*10; // Zuweisung im TERANiS-Bereich
+      }
+      else
+      {
+        // unbekanntes Gerät
+        char msg[100];
+        snprintf (msg, 100, "unbekannter Sensor: 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x",
+          tempDeviceAddress[0],tempDeviceAddress[1],tempDeviceAddress[2],tempDeviceAddress[3],
+          tempDeviceAddress[4],tempDeviceAddress[5],tempDeviceAddress[6],tempDeviceAddress[7]);
+        TelnetMsg(msg);
+        Serial.println(msg);
+      }
       // build Telnet Message
       char msg[50];
-      snprintf (msg, 49, "Sensor: %i %s %f °C",i,ort,tempC);
-      //TelnetMsg(msg);
+      snprintf (msg, 50, "Sensor: %i %s %f °C",i,ort,tempC);
+      TelnetMsg(msg);
       Serial.println(msg);
     }
     //else ghost device! Check your power requirements and cabling

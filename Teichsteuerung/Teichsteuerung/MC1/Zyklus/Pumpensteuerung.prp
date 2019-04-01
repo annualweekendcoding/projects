@@ -30,12 +30,12 @@ V1100
 "Pumpensteuerung_P10","BOOL","","","0","",0,0,1,655874
 "Pumpensteuerung_P11","BOOL","","","0","",0,0,1,721410
 "Pumpensteuerung_P12","BOOL","","","0","",0,0,1,786946
-"Mindestzeit","INT","F(int16_t,20)","Minimale Zeit für alle Pumpenaktionen","17","",0,0,0,1
-"Nachfuellzeit_max","INT","F(int16_t,22)","Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird","18","",0,0,0,1
-"Pumpe_Standzeit_max","INT","F(int16_t,24)","Maximale Stillstandszeit der Pumpe","19","",0,0,0,1
-"Pumpe_Laufzeit_max","INT","F(int16_t,26)","Maximale Laufzeit der Pumpe","20","",0,0,0,1
-"Teich_Temp_max","INT","F(int16_t,28)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
-"Teich_Temp_min","INT","F(int16_t,30)","Teichtemperatur ab der auf heizen geschaltet wird","22","",0,0,0,1
+"Mindestzeit","INT","R(int16_t,0)","Minimale Zeit für alle Pumpenaktionen","17","",0,0,0,1
+"Nachfuellzeit_max","INT","R(int16_t,2)","Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird","18","",0,0,0,1
+"Pumpe_Standzeit_max","INT","R(int16_t,4)","Maximale Stillstandszeit der Pumpe","19","",0,0,0,1
+"Pumpe_Laufzeit_max","INT","R(int16_t,6)","Maximale Laufzeit der Pumpe","20","",0,0,0,1
+"Teich_Temp_max","INT","R(int16_t,8)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
+"Teich_Temp_min","INT","R(int16_t,10)","Teichtemperatur ab der auf heizen geschaltet wird","22","",0,0,0,1
 "Pumpe_gesperrt","BOOL","FX(0,3)","Pumpe gesperrt","23","",0,0,0,1
 }
 IniOp: 4
@@ -55,7 +55,7 @@ OpVars {
 PVars {
 "Füllstand Pumpenschacht unterschritten","nicht Füllstand Pumpenschacht unterschritten"="|Pumpe_Fuellst_MIN|||"
 "Füllstand Filtergraben unterschritten","nicht Füllstand Filtergraben unterschritten"="|Filter_Fuellst_MIN|||"
-"Mindestenstzeit vergangen","nicht Mindestenstzeit vergangen"="|Pumpensteuerung_P0|VGL|time_akt>=Mindestzeit|"
+"Mindestzeit vergangen","nicht Mindestzeit vergangen"="|Pumpensteuerung_P0|VGL|time_akt>=Mindestzeit|"
 "Einschaltzeit/10?","nicht Einschaltzeit/10?"="|Pumpensteuerung_P1|VGL|Pumpe_Zeit_EIN_Letzte>327|"
 "Zeitüberlauf","nicht Zeitüberlauf"="|Pumpensteuerung_P2|VGL|Pumpe_Zeit_EIN_Letzte<=0 or Pumpe_Zeit_AUS_Letzte<=0|"
 "Temperatur an Pumpe größer als im Teich","nicht Temperatur an Pumpe größer als im Teich"="|Pumpensteuerung_P3|VGL|(Teich_Pumpe_Temp+2) > Teich_vorn_unten_Temp|"

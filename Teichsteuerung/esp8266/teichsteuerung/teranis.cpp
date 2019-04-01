@@ -48,4 +48,9 @@ void setup_teranis()
   #if PLC_F_SIZE>0
     for (int i=0; i<PLC_F_SIZE; i++) Flags[i]=0;
   #endif
+
+  #if PLC_R_SIZE>0
+    for (int i=0; i<PLC_R_SIZE; i++) RFlags[i]=0;
+    // TODO: Remanente Flags aus Datei lesen
+  #endif
 }

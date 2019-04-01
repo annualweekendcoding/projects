@@ -9,7 +9,7 @@ FUNCTION_BLOCK Pumpensteuerung
 VAR
   Pumpensteuerung_Op0 : BYTE; // aktive Operationsnummer
   time_last : INT; // gemerkte Zeit
-  Pumpensteuerung_P0 : BOOL; // Mindestenstzeit vergangen
+  Pumpensteuerung_P0 : BOOL; // Mindestzeit vergangen
   Pumpensteuerung_P1 : BOOL; // Einschaltzeit/10?
   Pumpensteuerung_P2 : BOOL; // Zeitüberlauf
   Pumpensteuerung_P3 : BOOL; // Temperatur an Pumpe größer als im Teich
@@ -38,12 +38,12 @@ VAR_EXTERNAL
   Filter_Fuellst_MIN_Stoer AT %FX(0,2) : BOOL; // Füllstandssensor Filtergraben gestört
   Teich_Pumpe_Temp AT %I(int16_t,14) : INT; // Temperatur Pumpenschacht
   time_akt AT %F(int16_t,18) : INT; // aktuelle Zeit seit letzter gemerkter Zeit
-  Mindestzeit AT %F(int16_t,20) : INT; // Minimale Zeit für alle Pumpenaktionen
-  Nachfuellzeit_max AT %F(int16_t,22) : INT; // Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird
-  Pumpe_Standzeit_max AT %F(int16_t,24) : INT; // Maximale Stillstandszeit der Pumpe
-  Pumpe_Laufzeit_max AT %F(int16_t,26) : INT; // Maximale Laufzeit der Pumpe
-  Teich_Temp_max AT %F(int16_t,28) : INT; // Teichtemperatur ab der auf kühlen geschaltet wird
-  Teich_Temp_min AT %F(int16_t,30) : INT; // Teichtemperatur ab der auf heizen geschaltet wird
+  Mindestzeit AT %R(int16_t,0) : INT; // Minimale Zeit für alle Pumpenaktionen
+  Nachfuellzeit_max AT %R(int16_t,2) : INT; // Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird
+  Pumpe_Standzeit_max AT %R(int16_t,4) : INT; // Maximale Stillstandszeit der Pumpe
+  Pumpe_Laufzeit_max AT %R(int16_t,6) : INT; // Maximale Laufzeit der Pumpe
+  Teich_Temp_max AT %R(int16_t,8) : INT; // Teichtemperatur ab der auf kühlen geschaltet wird
+  Teich_Temp_min AT %R(int16_t,10) : INT; // Teichtemperatur ab der auf heizen geschaltet wird
   Pumpe_gesperrt AT %FX(0,3) : BOOL; // Pumpe gesperrt
 END_VAR
 VAR_TEMP
