@@ -93,15 +93,31 @@ void setup_temperature() {
 }
 
 // Adressen der Temperatursensoren am Teich
-DeviceAddress Teich_vorn_oben_Temp_Adress = { 0x28, 0x88, 0x42, 0x2D, 0x01, 0x00, 0x00, 0x79 };
-DeviceAddress Teich_vorn_unten_Temp_Adress = { 0x28, 0x3E, 0x66, 0x2D, 0x01, 0x00, 0x00, 0x2B };
-DeviceAddress Solar_Ausgang_Temp_Adress = { 0x28, 0xE0, 0x70, 0x15, 0x02, 0x00, 0x00, 0xAC };
-DeviceAddress Teich_Luft_Temp_Adress = { 0x28, 0x60, 0x1F, 0x2D, 0x01, 0x00, 0x00, 0x88 };
-DeviceAddress Pumpe_Temp_Adress = { 0x28, 0x6c, 0x62, 0x2d, 0x01, 0x00, 0x00, 0x74 };
-DeviceAddress Filter_Temp_Adress = { 0x28, 0x3b, 0x3a, 0x2d, 0x01, 0x00, 0x00, 0x74 };
+const int SensorCount = 6;
+struct Sensor
+{
+  DeviceAddress address; // Adresse des Sensors
+  float temp; // aktueller Temperaturwert
+  char * ort; // Ort für Printausgabe
+  int hmid; // Homematic ise_id
+  int16_t &var; // TERANiS Variable
+  float lastHmTemp; // letzter Temperaturwert an Homematic gesendet
+  int64_t lastHmTime; // letzte Zeit an HM gesendet
+} Sensors[SensorCount] =
+{
+  {{ 0x28, 0x88, 0x42, 0x2D, 0x01, 0x00, 0x00, 0x79 }, -50.0, "vorn oben", 16967, I(int16_t,6), -50.0, 0 },
+  {{ 0x28, 0x3E, 0x66, 0x2D, 0x01, 0x00, 0x00, 0x2B }, -50.0, "vorn unten", 16966, I(int16_t,8), -50.0, 0 },
+  {{ 0x28, 0xE0, 0x70, 0x15, 0x02, 0x00, 0x00, 0xAC }, -50.0, "Solar Ausgang", 16968, I(int16_t,10), -50.0, 0 },
+  {{ 0x28, 0x60, 0x1F, 0x2D, 0x01, 0x00, 0x00, 0x88 }, -50.0, "Luft", 16965, I(int16_t,12), -50.0, 0 },
+  {{ 0x28, 0x6c, 0x62, 0x2d, 0x01, 0x00, 0x00, 0x74 }, -50.0, "Pumpe", 16969, I(int16_t,14), -50.0, 0 },
+  {{ 0x28, 0x3b, 0x3a, 0x2d, 0x01, 0x00, 0x00, 0x74 }, -50.0, "Filter", 16964, I(int16_t,16), -50.0, 0 }
+};  
 
 // Funktion aus dem Reiter telnet
 void TelnetMsg(String text);
+
+// Funktion aus dem Reiter Homematic
+bool HMStateChange(int id, float value);
 
 void read_temperatures()
 {
@@ -109,6 +125,11 @@ void read_temperatures()
   {
     setup_temperature();  
   }
+  // Defaultvalue für alle Sensoren setzen
+  for (int i=0; i<SensorCount; i++)
+  {
+    Sensors[i].temp=-50.0;
+  }   
   // call sensors.requestTemperatures() to issue a global temperature
   // request to all devices on the bus
   //sensors.requestTemperatures(); // Send the command to get temperatures
@@ -122,38 +143,16 @@ void read_temperatures()
       numberOfRealDevices++;
       sensors.requestTemperaturesByAddress(tempDeviceAddress);
       float tempC = sensors.getTempC(tempDeviceAddress);
-      char *ort="unbekannt";
-      if (isEqual(tempDeviceAddress,Teich_vorn_oben_Temp_Adress)) 
+      bool found=false;
+      for (int i=0; i<SensorCount; i++)
       {
-        ort="Teich_vorn_oben";
-        I(int16_t,6)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else if (isEqual(tempDeviceAddress,Teich_vorn_unten_Temp_Adress)) 
-      {
-        ort="Teich_vorn_unten";
-        I(int16_t,8)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else if (isEqual(tempDeviceAddress,Solar_Ausgang_Temp_Adress)) 
-      {
-        ort="Solar_Ausgang";
-        I(int16_t,10)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else if (isEqual(tempDeviceAddress,Teich_Luft_Temp_Adress)) 
-      {
-        ort="Luft";
-        I(int16_t,12)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else if (isEqual(tempDeviceAddress,Pumpe_Temp_Adress)) 
-      {
-        ort="Pumpe";
-        I(int16_t,14)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else if (isEqual(tempDeviceAddress,Filter_Temp_Adress)) 
-      {
-        ort="Filter";
-        I(int16_t,16)=tempC*10; // Zuweisung im TERANiS-Bereich
-      }
-      else
+        if (isEqual(tempDeviceAddress,Sensors[i].address)) 
+        {
+          Sensors[i].temp=tempC;
+          found=true;
+        }
+      }  
+      if (!found)
       {
         // unbekanntes Gerät
         char msg[100];
@@ -163,12 +162,28 @@ void read_temperatures()
         TelnetMsg(msg);
         Serial.println(msg);
       }
-      // build Telnet Message
-      char msg[50];
-      snprintf (msg, 50, "Sensor: %i %s %f °C",i,ort,tempC);
-      TelnetMsg(msg);
-      Serial.println(msg);
     }
     //else ghost device! Check your power requirements and cabling
   }
+  // Werte setzen
+  int64_t akttime = millis();
+  for (int i=0; i<SensorCount; i++)
+  {
+    Sensors[i].var = Sensors[i].temp*10; // TERANiS-Variable setzen
+
+    // Homematic nur max alle 3min setzen
+    if (Sensors[i].hmid!=0 && Sensors[i].temp!=Sensors[i].lastHmTemp && (akttime-Sensors[i].lastHmTime)>3*60*1000) 
+    {
+      if (HMStateChange(Sensors[i].hmid,Sensors[i].temp)) Sensors[i].lastHmTemp = Sensors[i].temp;
+      Sensors[i].lastHmTime = akttime;
+    }
+    if (Sensors[i].temp>-50.0)
+    {
+      // build Telnet Message
+      char msg[50];
+      snprintf (msg, 50, "Sensor: %s %f °C",Sensors[i].ort,Sensors[i].temp);
+      TelnetMsg(msg);
+      Serial.println(msg);
+    }
+  }   
 }
