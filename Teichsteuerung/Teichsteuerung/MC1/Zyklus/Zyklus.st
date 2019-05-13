@@ -1,5 +1,6 @@
 { #use "akttimes.st" }
 { #use "Pumpensteuerung.st" }
+{ #use "Solaranlage.st" }
 { #use "Temperatursensoren.st" }
 FUNCTION_BLOCK Zyklus
 // automatisch generiert von TERANiS-Studio, bitte Änderungen nur dort vornehmen.
@@ -7,6 +8,7 @@ FUNCTION_BLOCK Zyklus
 { #define author "TERANiS" }
 VAR
   I_Pumpensteuerung : Pumpensteuerung;
+  I_Solaranlage : Solaranlage;
   I_Temperatursensoren : Temperatursensoren;
 END_VAR
 VAR_EXTERNAL
@@ -14,6 +16,7 @@ VAR_EXTERNAL
 END_VAR
   akttimes(); // akttimes.st
   I_Pumpensteuerung(); // Pumpensteuerung.prp
+  I_Solaranlage(); // Solaranlage.prp
   I_Temperatursensoren(); // Temperatursensoren.prp
   // Initialisierungsvariable setzen
   _INIT := TRUE;

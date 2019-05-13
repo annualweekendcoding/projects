@@ -273,6 +273,73 @@ void Pumpensteuerung (
 
 #endif
 
+#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
+#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
+
+// BEGIN_BLOCK Solaranlage
+struct Solaranlage {
+  /* VAR */
+  /* Operation 0 aktiv*/
+  uint8_t Solaranlage_Op0;
+  /* Aussentemperatur > 4°C*/
+  bool Solaranlage_P0;
+  /* Solartemperatur > Teichtemperatur*/
+  bool Solaranlage_P1;
+  int16_t z;
+};
+void Solaranlage (
+  struct Solaranlage *inst
+  )
+{
+  /* Automatisch generiert von TeCAD, bitte Änderungen nur dort vornehmen.*/
+  /* Titel: Solaranlage */
+  /* Author: TeCAD */
+  if (!FX(0,0))
+  {
+    (*inst).Solaranlage_Op0 = ((uint8_t) (2));
+  }
+  /* Initialisierung der Operationsvariablen */
+  /* Berechnung der nicht binären Prozeßvariablen */
+  (*inst).Solaranlage_P0 = I(int16_t,12) > 40;
+  (*inst).Solaranlage_P1 = I(int16_t,10) > I(int16_t,8);
+  if (((int64_t) ((*inst).Solaranlage_Op0)) == 0)
+  {
+    if (((*inst).Solaranlage_P0 && (*inst).Solaranlage_P1))
+    {
+      (*inst).Solaranlage_Op0 = ((uint8_t) (1));
+    }
+  }
+  else if (((int64_t) ((*inst).Solaranlage_Op0)) == 1)
+  {
+    if ((!(*inst).Solaranlage_P0 || !(*inst).Solaranlage_P1))
+    {
+      (*inst).Solaranlage_Op0 = ((uint8_t) (0));
+    }
+  }
+  else
+  {
+    (*inst).Solaranlage_Op0 = ((uint8_t) (0));
+  }
+  /* Ausgabe der Operationsübergänge */
+  /* Auswahl der Operation 0 */
+  /* Übergang von Operation 0 zu Operation 1 */
+  /* Auswahl der Operation 1 */
+  /* Übergang von Operation 1 zu Operation 0 */
+  /* Initialisierung wenn keine Operation gesetzt ist */
+  /* Zuweisung der Operationsvariablen */
+  /* Magnetventil Fischwasser einschalten */
+  QX(0,2) = (((int64_t) ((*inst).Solaranlage_Op0)) == 1);
+  if ((((int64_t) ((*inst).Solaranlage_Op0)) == 0))
+  {
+    (*inst).z = F(int16_t,4);
+  }
+  /* Ausgabe Sonderfunktionen und Timeraufrufe */
+  /* Zeit merken */
+}
+// END_BLOCK
+
+#endif
+
 #ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Temperatursensoren_st
 #define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Temperatursensoren_st
 
@@ -370,6 +437,7 @@ void Temperatursensoren (
 struct Zyklus {
   /* VAR */
   struct Pumpensteuerung I_Pumpensteuerung;
+  struct Solaranlage I_Solaranlage;
   struct Temperatursensoren I_Temperatursensoren;
 };
 void Zyklus (
@@ -381,9 +449,11 @@ void Zyklus (
   /* Author: TERANiS */
   akttimes();
   Pumpensteuerung(&((*inst).I_Pumpensteuerung));
+  Solaranlage(&((*inst).I_Solaranlage));
   Temperatursensoren(&((*inst).I_Temperatursensoren));
   /* akttimes.st */
   /* Pumpensteuerung.prp */
+  /* Solaranlage.prp */
   /* Temperatursensoren.prp */
   /* Initialisierungsvariable setzen */
   FX(0,0) = true;
