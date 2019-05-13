@@ -24,14 +24,14 @@ void Solaranlage (
   /* Berechnung der nicht binären Prozeßvariablen */
   (*inst).Solaranlage_P0 = I(int16_t,12) > 40;
   (*inst).Solaranlage_P1 = I(int16_t,10) > I(int16_t,8);
-  if (((int64_t) ((*inst).Solaranlage_Op0)) == 0)
+  if ((*inst).Solaranlage_Op0 == ((uint8_t) (0)))
   {
     if (((*inst).Solaranlage_P0 && (*inst).Solaranlage_P1))
     {
       (*inst).Solaranlage_Op0 = ((uint8_t) (1));
     }
   }
-  else if (((int64_t) ((*inst).Solaranlage_Op0)) == 1)
+  else if ((*inst).Solaranlage_Op0 == ((uint8_t) (1)))
   {
     if ((!(*inst).Solaranlage_P0 || !(*inst).Solaranlage_P1))
     {
@@ -50,8 +50,8 @@ void Solaranlage (
   /* Initialisierung wenn keine Operation gesetzt ist */
   /* Zuweisung der Operationsvariablen */
   /* Magnetventil Fischwasser einschalten */
-  QX(0,2) = (((int64_t) ((*inst).Solaranlage_Op0)) == 1);
-  if ((((int64_t) ((*inst).Solaranlage_Op0)) == 0))
+  QX(0,2) = ((*inst).Solaranlage_Op0 == ((uint8_t) (1)));
+  if (((*inst).Solaranlage_Op0 == ((uint8_t) (0))))
   {
     (*inst).z = F(int16_t,4);
   }
