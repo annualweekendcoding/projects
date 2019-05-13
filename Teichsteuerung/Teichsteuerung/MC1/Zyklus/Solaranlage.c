@@ -1,6 +1,3 @@
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
-
 // BEGIN_BLOCK Solaranlage
 struct Solaranlage {
   /* VAR */
@@ -63,4 +60,3 @@ void Solaranlage (
 }
 // END_BLOCK
 
-#endif

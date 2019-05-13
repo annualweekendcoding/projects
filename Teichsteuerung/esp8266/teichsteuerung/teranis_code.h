@@ -1,6 +1,3 @@
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_akttimes_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_akttimes_st
-
 // BEGIN_BLOCK akttimes
 void akttimes ()
 {
@@ -27,10 +24,6 @@ void akttimes ()
 }
 // END_BLOCK
 
-#endif
-
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Pumpensteuerung_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Pumpensteuerung_st
 
 // BEGIN_BLOCK Pumpensteuerung
 struct Pumpensteuerung {
@@ -271,10 +264,6 @@ void Pumpensteuerung (
 }
 // END_BLOCK
 
-#endif
-
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Solaranlage_st
 
 // BEGIN_BLOCK Solaranlage
 struct Solaranlage {
@@ -338,10 +327,6 @@ void Solaranlage (
 }
 // END_BLOCK
 
-#endif
-
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Temperatursensoren_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Temperatursensoren_st
 
 // BEGIN_BLOCK Temperatursensoren
 struct Temperatursensoren {
@@ -371,22 +356,22 @@ void Temperatursensoren (
   /* Berechnung der nicht binären Prozeßvariablen */
   (*inst).Temperatursensoren_P0 = (*inst).diff > 10000;
   (*inst).Temperatursensoren_P1 = (*inst).diff > 10010;
-  if ((*inst).Temperatursensoren_Op0 == ((uint8_t) (0)))
+  if (((int64_t) ((*inst).Temperatursensoren_Op0)) == 0)
   {
     (*inst).Temperatursensoren_Op0 = ((uint8_t) (1));
   }
-  else if ((*inst).Temperatursensoren_Op0 == ((uint8_t) (1)))
+  else if (((int64_t) ((*inst).Temperatursensoren_Op0)) == 1)
   {
     if ((*inst).Temperatursensoren_P0)
     {
       (*inst).Temperatursensoren_Op0 = ((uint8_t) (3));
     }
   }
-  else if ((*inst).Temperatursensoren_Op0 == ((uint8_t) (2)))
+  else if (((int64_t) ((*inst).Temperatursensoren_Op0)) == 2)
   {
     (*inst).Temperatursensoren_Op0 = ((uint8_t) (0));
   }
-  else if ((*inst).Temperatursensoren_Op0 == ((uint8_t) (3)))
+  else if (((int64_t) ((*inst).Temperatursensoren_Op0)) == 3)
   {
     if ((*inst).Temperatursensoren_P1)
     {
@@ -409,12 +394,12 @@ void Temperatursensoren (
   /* Initialisierung wenn keine Operation gesetzt ist */
   /* Zuweisung der Operationsvariablen */
   /* Temperaturen vom OneWire einlesen */
-  QX(0,1) = ((*inst).Temperatursensoren_Op0 == ((uint8_t) (2)));
+  QX(0,1) = (((int64_t) ((*inst).Temperatursensoren_Op0)) == 2);
   /* Spannung für Temperatursensoren einschalten */
-  QX(0,6) = ((*inst).Temperatursensoren_Op0 == ((uint8_t) (2))) || ((*inst).Temperatursensoren_Op0 == ((uint8_t) (3)));
+  QX(0,6) = (((int64_t) ((*inst).Temperatursensoren_Op0)) == 2) || (((int64_t) ((*inst).Temperatursensoren_Op0)) == 3);
   /* Differenz berechnen */
-  _OV3 = ((*inst).Temperatursensoren_Op0 == ((uint8_t) (1))) || ((*inst).Temperatursensoren_Op0 == ((uint8_t) (3)));
-  if (((*inst).Temperatursensoren_Op0 == ((uint8_t) (0))))
+  _OV3 = (((int64_t) ((*inst).Temperatursensoren_Op0)) == 1) || (((int64_t) ((*inst).Temperatursensoren_Op0)) == 3);
+  if ((((int64_t) ((*inst).Temperatursensoren_Op0)) == 0))
   {
     F(int16_t,8) = F(int16_t,2);
   }
@@ -428,10 +413,6 @@ void Temperatursensoren (
 }
 // END_BLOCK
 
-#endif
-
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Zyklus_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Zyklus_st
 
 // BEGIN_BLOCK Zyklus
 struct Zyklus {
@@ -460,5 +441,4 @@ void Zyklus (
 }
 // END_BLOCK
 
-#endif
 

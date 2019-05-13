@@ -1,6 +1,3 @@
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Pumpensteuerung_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_Pumpensteuerung_st
-
 // BEGIN_BLOCK Pumpensteuerung
 struct Pumpensteuerung {
   /* VAR */
@@ -240,4 +237,3 @@ void Pumpensteuerung (
 }
 // END_BLOCK
 
-#endif

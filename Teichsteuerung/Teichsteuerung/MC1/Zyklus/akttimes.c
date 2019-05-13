@@ -1,6 +1,3 @@
-#ifndef INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_akttimes_st
-#define INC_GUARD_C__daten_annualweekendcoding_projects_Teichsteuerung_Teichsteuerung_MC1_Zyklus_akttimes_st
-
 // BEGIN_BLOCK akttimes
 void akttimes ()
 {
@@ -27,4 +24,3 @@ void akttimes ()
 }
 // END_BLOCK
 
-#endif
