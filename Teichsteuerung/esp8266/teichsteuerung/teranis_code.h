@@ -42,7 +42,7 @@ struct Pumpensteuerung {
   bool Pumpensteuerung_P3;
   /* maximale Nachfüllzeit vergangen*/
   bool Pumpensteuerung_P4;
-  /* Temperatursensor gestört*/
+  /* Temperatursensor Pumpe gestört*/
   bool Pumpensteuerung_P5;
   /* maximale Ausschaltzeit vergangen*/
   bool Pumpensteuerung_P6;
@@ -58,6 +58,8 @@ struct Pumpensteuerung {
   bool Pumpensteuerung_P11;
   /* Temperatur im Teich zu klein*/
   bool Pumpensteuerung_P12;
+  /* Temperatursensor Teich vorn unten gestört*/
+  bool Pumpensteuerung_P13;
 };
 void Pumpensteuerung (
   struct Pumpensteuerung *inst
@@ -81,7 +83,7 @@ void Pumpensteuerung (
   (*inst).Pumpensteuerung_P2 = F(int16_t,10) <= 0 || F(int16_t,12) <= 0;
   (*inst).Pumpensteuerung_P3 = (I(int16_t,14) + 2) > I(int16_t,8);
   (*inst).Pumpensteuerung_P4 = F(int16_t,18) >= R(int16_t,2);
-  (*inst).Pumpensteuerung_P5 = (I(int16_t,14) < ((int16_t) (-50))) || (I(int16_t,8) < ((int16_t) (-50)));
+  (*inst).Pumpensteuerung_P5 = I(int16_t,14) <= ((int16_t) (-50));
   (*inst).Pumpensteuerung_P6 = F(int16_t,18) >= R(int16_t,4);
   (*inst).Pumpensteuerung_P7 = F(int16_t,10) > 3270;
   (*inst).Pumpensteuerung_P8 = F(int16_t,18) >= R(int16_t,6);
@@ -89,6 +91,7 @@ void Pumpensteuerung (
   (*inst).Pumpensteuerung_P10 = I(int16_t,8) > R(int16_t,8);
   (*inst).Pumpensteuerung_P11 = (I(int16_t,8) + 2) > I(int16_t,14);
   (*inst).Pumpensteuerung_P12 = I(int16_t,8) < R(int16_t,10);
+  (*inst).Pumpensteuerung_P13 = I(int16_t,8) <= ((int16_t) (-50));
   if ((*inst).Pumpensteuerung_Op0 == ((uint8_t) (0)))
   {
     if ((!FX(0,3) && (*inst).Pumpensteuerung_P0 && IX(0,0)))
@@ -100,10 +103,11 @@ void Pumpensteuerung (
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (8));
     }
     if ((!FX(0,3) && (*inst).Pumpensteuerung_P0 && !IX(0,0) && ((!IX(0,1) && ((*inst).Pumpensteuerung_P5
-     || ((*inst).Pumpensteuerung_P10 && (*inst).Pumpensteuerung_P11) || (!(*inst).Pumpensteuerung_P10 &&
-     (!(*inst).Pumpensteuerung_P12 || (*inst).Pumpensteuerung_P3)))) || (((IX(0,1) && !(*inst).Pumpensteuerung_P4)
-     || (!IX(0,1) && !(*inst).Pumpensteuerung_P5 && (((*inst).Pumpensteuerung_P10 && !(*inst).Pumpensteuerung_P11)
-     || (!(*inst).Pumpensteuerung_P10 && (*inst).Pumpensteuerung_P12 && !(*inst).Pumpensteuerung_P3)))) && (*inst).Pumpensteuerung_P6))))
+     || (*inst).Pumpensteuerung_P13 || ((*inst).Pumpensteuerung_P10 && (*inst).Pumpensteuerung_P11) || (!(*inst).Pumpensteuerung_P10
+     && (!(*inst).Pumpensteuerung_P12 || (*inst).Pumpensteuerung_P3)))) || (((IX(0,1) && !(*inst).Pumpensteuerung_P4)
+     || (!IX(0,1) && !(*inst).Pumpensteuerung_P5 && !(*inst).Pumpensteuerung_P13 && (((*inst).Pumpensteuerung_P10
+     && !(*inst).Pumpensteuerung_P11) || (!(*inst).Pumpensteuerung_P10 && (*inst).Pumpensteuerung_P12 &&
+     !(*inst).Pumpensteuerung_P3)))) && (*inst).Pumpensteuerung_P6))))
     {
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (3));
     }
@@ -115,8 +119,8 @@ void Pumpensteuerung (
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (4));
     }
     if ((!FX(0,3) && (*inst).Pumpensteuerung_P0 && ((*inst).Pumpensteuerung_P8 || IX(0,0) || (!(*inst).Pumpensteuerung_P5
-     && (((*inst).Pumpensteuerung_P10 && !(*inst).Pumpensteuerung_P11) || (!(*inst).Pumpensteuerung_P10 &&
-     (*inst).Pumpensteuerung_P12 && !(*inst).Pumpensteuerung_P3)) && (*inst).Pumpensteuerung_P9))))
+     && !(*inst).Pumpensteuerung_P13 && (((*inst).Pumpensteuerung_P10 && !(*inst).Pumpensteuerung_P11) ||
+     (!(*inst).Pumpensteuerung_P10 && (*inst).Pumpensteuerung_P12 && !(*inst).Pumpensteuerung_P3)) && (*inst).Pumpensteuerung_P9))))
     {
       (*inst).Pumpensteuerung_Op0 = ((uint8_t) (5));
     }
@@ -275,6 +279,12 @@ struct Solaranlage {
   /* Solartemperatur > Teichtemperatur*/
   bool Solaranlage_P1;
   int16_t z;
+  /* Temperatursensor Solar gestört*/
+  bool Solaranlage_P2;
+  /* Temperatur im Teich zu gross*/
+  bool Solaranlage_P3;
+  /* Temperatursensor Teich vorn unten gestört*/
+  bool Solaranlage_P4;
 };
 void Solaranlage (
   struct Solaranlage *inst
@@ -291,16 +301,21 @@ void Solaranlage (
   /* Berechnung der nicht binären Prozeßvariablen */
   (*inst).Solaranlage_P0 = I(int16_t,12) > 40;
   (*inst).Solaranlage_P1 = I(int16_t,10) > I(int16_t,8);
+  (*inst).Solaranlage_P3 = I(int16_t,8) > R(int16_t,8);
+  (*inst).Solaranlage_P4 = I(int16_t,8) <= ((int16_t) (-50));
+  (*inst).Solaranlage_P2 = I(int16_t,10) <= ((int16_t) (-50));
   if ((*inst).Solaranlage_Op0 == ((uint8_t) (0)))
   {
-    if (((*inst).Solaranlage_P0 && (*inst).Solaranlage_P1))
+    if ((!(*inst).Solaranlage_P2 && !(*inst).Solaranlage_P4 && (*inst).Solaranlage_P0 && (((*inst).Solaranlage_P3
+     && !(*inst).Solaranlage_P1) || (!(*inst).Solaranlage_P3 && (*inst).Solaranlage_P1))))
     {
       (*inst).Solaranlage_Op0 = ((uint8_t) (1));
     }
   }
   else if ((*inst).Solaranlage_Op0 == ((uint8_t) (1)))
   {
-    if ((!(*inst).Solaranlage_P0 || !(*inst).Solaranlage_P1))
+    if (((*inst).Solaranlage_P2 || (*inst).Solaranlage_P4 || !(*inst).Solaranlage_P0 || ((*inst).Solaranlage_P3
+     && (*inst).Solaranlage_P1) || (!(*inst).Solaranlage_P3 && !(*inst).Solaranlage_P1)))
     {
       (*inst).Solaranlage_Op0 = ((uint8_t) (0));
     }

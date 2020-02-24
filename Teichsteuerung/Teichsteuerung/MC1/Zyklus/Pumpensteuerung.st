@@ -14,7 +14,7 @@ VAR
   Pumpensteuerung_P2 : BOOL; // Zeitüberlauf
   Pumpensteuerung_P3 : BOOL; // Temperatur an Pumpe größer als im Teich
   Pumpensteuerung_P4 : BOOL; // maximale Nachfüllzeit vergangen
-  Pumpensteuerung_P5 : BOOL; // Temperatursensor gestört
+  Pumpensteuerung_P5 : BOOL; // Temperatursensor Pumpe gestört
   Pumpensteuerung_P6 : BOOL; // maximale Ausschaltzeit vergangen
   Pumpensteuerung_P7 : BOOL; // Einschaltzeit/100 ?
   Pumpensteuerung_P8 : BOOL; // maximale Einschaltzeit vergangen
@@ -22,6 +22,7 @@ VAR
   Pumpensteuerung_P10 : BOOL; // Temperatur im Teich zu gross
   Pumpensteuerung_P11 : BOOL; // Temperatur im Teich größer als an Pumpe
   Pumpensteuerung_P12 : BOOL; // Temperatur im Teich zu klein
+  Pumpensteuerung_P13 : BOOL; // Temperatursensor Teich vorn unten gestört
 END_VAR
 VAR_EXTERNAL
   _INIT AT %FX(0,0) : BOOL; // Initialisierungsvariable
@@ -66,7 +67,7 @@ Pumpensteuerung_P1 := Pumpe_Zeit_EIN_Letzte>327;
 Pumpensteuerung_P2 := Pumpe_Zeit_EIN_Letzte<=0 or Pumpe_Zeit_AUS_Letzte<=0;
 Pumpensteuerung_P3 := (Teich_Pumpe_Temp+2) > Teich_vorn_unten_Temp;
 Pumpensteuerung_P4 := time_akt>=Nachfuellzeit_max;
-Pumpensteuerung_P5 := (Teich_Pumpe_Temp<-50) OR (Teich_vorn_unten_Temp<-50);
+Pumpensteuerung_P5 := Teich_Pumpe_Temp<=-50;
 Pumpensteuerung_P6 := time_akt>=Pumpe_Standzeit_max;
 Pumpensteuerung_P7 := Pumpe_Zeit_EIN_Letzte>3270;
 Pumpensteuerung_P8 := time_akt>=Pumpe_Laufzeit_max;
@@ -74,6 +75,7 @@ Pumpensteuerung_P9 := time_akt>=180;
 Pumpensteuerung_P10 := Teich_vorn_unten_Temp > Teich_Temp_max;
 Pumpensteuerung_P11 := (Teich_vorn_unten_Temp+2) > Teich_Pumpe_Temp;
 Pumpensteuerung_P12 := Teich_vorn_unten_Temp < Teich_Temp_min;
+Pumpensteuerung_P13 := Teich_vorn_unten_Temp<=-50;
 
 // Ausgabe der Operationsübergänge
 
@@ -89,7 +91,7 @@ IF Pumpensteuerung_Op0 = 0 THEN
     Pumpensteuerung_Op0 := 8;
   END_IF;
   // Übergang von Operation 0 zu Operation 3
-  IF (NOT Pumpe_gesperrt AND Pumpensteuerung_P0 AND NOT Pumpe_Fuellst_MIN AND ((NOT Filter_Fuellst_MIN AND (Pumpensteuerung_P5 OR (Pumpensteuerung_P10 AND Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND (NOT Pumpensteuerung_P12 OR Pumpensteuerung_P3)))) OR (((Filter_Fuellst_MIN AND NOT Pumpensteuerung_P4) OR (NOT Filter_Fuellst_MIN AND NOT Pumpensteuerung_P5 AND ((Pumpensteuerung_P10 AND NOT Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND Pumpensteuerung_P12 AND NOT Pumpensteuerung_P3)))) AND Pumpensteuerung_P6))) THEN
+  IF (NOT Pumpe_gesperrt AND Pumpensteuerung_P0 AND NOT Pumpe_Fuellst_MIN AND ((NOT Filter_Fuellst_MIN AND (Pumpensteuerung_P5 OR Pumpensteuerung_P13 OR (Pumpensteuerung_P10 AND Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND (NOT Pumpensteuerung_P12 OR Pumpensteuerung_P3)))) OR (((Filter_Fuellst_MIN AND NOT Pumpensteuerung_P4) OR (NOT Filter_Fuellst_MIN AND NOT Pumpensteuerung_P5 AND NOT Pumpensteuerung_P13 AND ((Pumpensteuerung_P10 AND NOT Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND Pumpensteuerung_P12 AND NOT Pumpensteuerung_P3)))) AND Pumpensteuerung_P6))) THEN
     Pumpensteuerung_Op0 := 3;
   END_IF;
 { #define errortag "OP1" }
@@ -100,7 +102,7 @@ ELSIF Pumpensteuerung_Op0 = 1 THEN
     Pumpensteuerung_Op0 := 4;
   END_IF;
   // Übergang von Operation 1 zu Operation 5
-  IF (NOT Pumpe_gesperrt AND Pumpensteuerung_P0 AND (Pumpensteuerung_P8 OR Pumpe_Fuellst_MIN OR (NOT Pumpensteuerung_P5 AND ((Pumpensteuerung_P10 AND NOT Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND Pumpensteuerung_P12 AND NOT Pumpensteuerung_P3)) AND Pumpensteuerung_P9))) THEN
+  IF (NOT Pumpe_gesperrt AND Pumpensteuerung_P0 AND (Pumpensteuerung_P8 OR Pumpe_Fuellst_MIN OR (NOT Pumpensteuerung_P5 AND NOT Pumpensteuerung_P13 AND ((Pumpensteuerung_P10 AND NOT Pumpensteuerung_P11) OR (NOT Pumpensteuerung_P10 AND Pumpensteuerung_P12 AND NOT Pumpensteuerung_P3)) AND Pumpensteuerung_P9))) THEN
     Pumpensteuerung_Op0 := 5;
   END_IF;
 { #define errortag "OP2" }

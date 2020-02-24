@@ -8,6 +8,12 @@ struct Solaranlage {
   /* Solartemperatur > Teichtemperatur*/
   bool Solaranlage_P1;
   int16_t z;
+  /* Temperatursensor Solar gestört*/
+  bool Solaranlage_P2;
+  /* Temperatur im Teich zu gross*/
+  bool Solaranlage_P3;
+  /* Temperatursensor Teich vorn unten gestört*/
+  bool Solaranlage_P4;
 };
 void Solaranlage (
   struct Solaranlage *inst
@@ -24,16 +30,21 @@ void Solaranlage (
   /* Berechnung der nicht binären Prozeßvariablen */
   (*inst).Solaranlage_P0 = I(int16_t,12) > 40;
   (*inst).Solaranlage_P1 = I(int16_t,10) > I(int16_t,8);
+  (*inst).Solaranlage_P3 = I(int16_t,8) > R(int16_t,8);
+  (*inst).Solaranlage_P4 = I(int16_t,8) <= ((int16_t) (-50));
+  (*inst).Solaranlage_P2 = I(int16_t,10) <= ((int16_t) (-50));
   if ((*inst).Solaranlage_Op0 == ((uint8_t) (0)))
   {
-    if (((*inst).Solaranlage_P0 && (*inst).Solaranlage_P1))
+    if ((!(*inst).Solaranlage_P2 && !(*inst).Solaranlage_P4 && (*inst).Solaranlage_P0 && (((*inst).Solaranlage_P3
+     && !(*inst).Solaranlage_P1) || (!(*inst).Solaranlage_P3 && (*inst).Solaranlage_P1))))
     {
       (*inst).Solaranlage_Op0 = ((uint8_t) (1));
     }
   }
   else if ((*inst).Solaranlage_Op0 == ((uint8_t) (1)))
   {
-    if ((!(*inst).Solaranlage_P0 || !(*inst).Solaranlage_P1))
+    if (((*inst).Solaranlage_P2 || (*inst).Solaranlage_P4 || !(*inst).Solaranlage_P0 || ((*inst).Solaranlage_P3
+     && (*inst).Solaranlage_P1) || (!(*inst).Solaranlage_P3 && !(*inst).Solaranlage_P1)))
     {
       (*inst).Solaranlage_Op0 = ((uint8_t) (0));
     }
