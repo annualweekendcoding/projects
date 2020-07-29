@@ -2,18 +2,19 @@
 { #define addnetworks true }
 { #define addcomments true }
 { #define addcontrolcomments false }
-FUNCTION_BLOCK Solaranlage
+FUNCTION Solaranlage : VOID
 // Automatisch generiert von TeCAD, bitte Änderungen nur dort vornehmen.
 { #define title "Solaranlage" }
 { #define author "TeCAD" }
 VAR
-  Solaranlage_Op0 : BYTE; // Operation 0 aktiv
-  Solaranlage_P0 : BOOL; // Aussentemperatur > 4°C
-  Solaranlage_P1 : BOOL; // Solartemperatur > Teichtemperatur
-  z : INT;
-  Solaranlage_P2 : BOOL; // Temperatursensor Solar gestört
-  Solaranlage_P3 : BOOL; // Temperatur im Teich zu gross
-  Solaranlage_P4 : BOOL; // Temperatursensor Teich vorn unten gestört
+  Solaranlage_Op0 AT %F(29) : BYTE; // Operation 0 aktiv
+  Solaranlage_P0 AT %FX(36,0) : BOOL; // Aussentemperatur > 4°C
+  Solaranlage_P1 AT %FX(36,1) : BOOL; // Solartemperatur > Teichtemperatur
+  Solaranlage_Zeit AT %F(32) : INT;
+  Solaranlage_P2 AT %FX(36,2) : BOOL; // Temperatursensor Solar gestört
+  Solaranlage_P3 AT %FX(36,3) : BOOL; // Temperatur im Teich zu gross
+  Solaranlage_P4 AT %FX(36,4) : BOOL; // Temperatursensor Teich vorn unten gestört
+  Solaranlage_P5 AT %FX(36,5) : BOOL; // Außentemperatursensor gestört
 END_VAR
 VAR_EXTERNAL
   _INIT AT %FX(0,0) : BOOL; // Initialisierungsvariable
@@ -39,6 +40,7 @@ Solaranlage_P1 := Solar_Ausgang_Temp > Teich_vorn_unten_Temp;
 Solaranlage_P3 := Teich_vorn_unten_Temp > Teich_Temp_max;
 Solaranlage_P4 := Teich_vorn_unten_Temp<=-50;
 Solaranlage_P2 := Solar_Ausgang_Temp<=-50;
+Solaranlage_P5 := Teich_Luft_Temp <= -50;
 
 // Ausgabe der Operationsübergänge
 
@@ -46,14 +48,14 @@ Solaranlage_P2 := Solar_Ausgang_Temp<=-50;
 // Auswahl der Operation 0
 IF Solaranlage_Op0 = 0 THEN
   // Übergang von Operation 0 zu Operation 1
-  IF (NOT Solaranlage_P2 AND NOT Solaranlage_P4 AND Solaranlage_P0 AND ((Solaranlage_P3 AND NOT Solaranlage_P1) OR (NOT Solaranlage_P3 AND Solaranlage_P1))) THEN
+  IF (NOT Solaranlage_P2 AND NOT Solaranlage_P4 AND (Solaranlage_P0 OR Solaranlage_P5) AND ((Solaranlage_P3 AND NOT Solaranlage_P1) OR (NOT Solaranlage_P3 AND Solaranlage_P1))) THEN
     Solaranlage_Op0 := 1;
   END_IF;
 { #define errortag "OP1" }
 // Auswahl der Operation 1
 ELSIF Solaranlage_Op0 = 1 THEN
   // Übergang von Operation 1 zu Operation 0
-  IF (Solaranlage_P2 OR Solaranlage_P4 OR NOT Solaranlage_P0 OR (Solaranlage_P3 AND Solaranlage_P1) OR (NOT Solaranlage_P3 AND NOT Solaranlage_P1)) THEN
+  IF (Solaranlage_P2 OR Solaranlage_P4 OR (NOT Solaranlage_P0 AND NOT Solaranlage_P5) OR (Solaranlage_P3 AND Solaranlage_P1) OR (NOT Solaranlage_P3 AND NOT Solaranlage_P1)) THEN
     Solaranlage_Op0 := 0;
   END_IF;
 { #define errortag "INIT" }
@@ -72,7 +74,7 @@ Fischwasser_ein := (Solaranlage_Op0=1);
 
 IF (Solaranlage_Op0=0) THEN
   // Zeit merken
-  z := time_sec;
+  Solaranlage_Zeit := time_sec;
 END_IF;
 
-END_FUNCTION_BLOCK
+END_FUNCTION

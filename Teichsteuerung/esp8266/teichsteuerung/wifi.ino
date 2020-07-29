@@ -11,7 +11,7 @@
 //wird in der folgenden Datei definiert
 #include "wifi_secrets.h"
 
-WiFiClient espClient;
+//WiFiClient espClient;
 
 void setup_wifi() {
 

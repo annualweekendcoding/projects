@@ -7,8 +7,9 @@ bool HMStateChange(int id, float value)
   // Dafür muss die ise_id bekannt sein. 
   char s[90];
   snprintf(s,90,"http://192.168.1.10//config/xmlapi/statechange.cgi?ise_id=%d&new_value=%f",id,value);
+  WiFiClient client;
   HTTPClient homematic;
-  homematic.begin(s);
+  homematic.begin(client,s);
   int httpCode = homematic.GET();
   homematic.end();
   return (httpCode>0);

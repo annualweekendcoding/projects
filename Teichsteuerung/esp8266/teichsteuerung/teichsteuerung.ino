@@ -27,8 +27,8 @@ void setup(void)
   R(int16_t,2) = 600; // Zeit bis der Min-Sensor im Filtergraben kommen muß wenn die Pumpe abgeschaltet wird
   R(int16_t,4) = 6000; // Maximale Stillstandszeit der Pumpe
   R(int16_t,6) = 600; // Maximale Laufzeit der Pumpe
-  R(int16_t,8) = 220; // Teichtemperatur ab der auf kühlen geschaltet wird
-  R(int16_t,10) = 180; // Teichtemperatur ab der auf heizen geschaltet wird
+  R(int16_t,8) = 230; // Teichtemperatur ab der auf kühlen geschaltet wird
+  R(int16_t,10) = 190; // Teichtemperatur ab der auf heizen geschaltet wird
 }
 
 uint8_t oldi = 0;

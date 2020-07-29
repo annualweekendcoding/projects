@@ -2,24 +2,25 @@ PRAP {
 V1100 
 .Vars {
 "_INIT","BOOL","FX(0,0)","Initialisierungsvariable","24","",0,0,0,1281
-"Solaranlage_Op0","BYTE","","","0","",0,0,1,259
+"Solaranlage_Op0","BYTE","F(29)","Operation 0 aktiv","50","",0,0,1,259
 "Fischwasser_ein","BOOL","QX(0,2)","Magnetventil Fischwasser einschalten","33","",0,0,0,2
-"time_sec","INT","F(int16_t,4)","Ticks in Sekunden als Umlaufzähler","9","",0,0,0,1
-"Solaranlage_P0","BOOL","","","0","",0,0,1,514
-"Teich_Luft_Temp","INT","I(int16_t,12)","Temperatur Luft","4","",0,0,0,1
-"Solaranlage_P1","BOOL","","","0","",0,0,1,66050
-"Solar_Ausgang_Temp","INT","I(int16_t,10)","Temperatur am Ausgang Solaranlage","26","",0,0,0,1
-"Teich_vorn_unten_Temp","INT","I(int16_t,8)","Temperatur Schwimmbereich vorn unten","6","",0,0,0,1
-"z","INT","","","0","",0,0,1,18
-"Teich_Temp_max","INT","R(int16_t,8)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
-"Solaranlage_P2","BOOL","","","0","",0,0,1,131586
-"Solaranlage_P3","BOOL","","","0","",0,0,1,197122
-"Solaranlage_P4","BOOL","","","0","",0,0,1,262658
+"time_sec","INT","F(4)","Ticks in Sekunden als Umlaufzähler","9","",0,0,0,1
+"Solaranlage_P0","BOOL","FX(36,0)","Aussentemperatur > 4°C","51","",0,0,1,514
+"Teich_Luft_Temp","INT","I(12)","Temperatur Luft","4","",0,0,0,1
+"Solaranlage_P1","BOOL","FX(36,1)","Solartemperatur > Teichtemperatur","52","",0,0,1,66050
+"Solar_Ausgang_Temp","INT","I(10)","Temperatur am Ausgang Solaranlage","26","",0,0,0,1
+"Teich_vorn_unten_Temp","INT","I(8)","Temperatur Schwimmbereich vorn unten","6","",0,0,0,1
+"Solaranlage_Zeit","INT","F(32)","","53","",0,0,1,18
+"Teich_Temp_max","INT","R(8)","Teichtemperatur ab der auf kühlen geschaltet wird","21","",0,0,0,1
+"Solaranlage_P2","BOOL","FX(36,2)","Temperatursensor Solar gestört","54","",0,0,1,131586
+"Solaranlage_P3","BOOL","FX(36,3)","Temperatur im Teich zu gross","55","",0,0,1,197122
+"Solaranlage_P4","BOOL","FX(36,4)","Temperatursensor Teich vorn unten gestört","56","",0,0,1,262658
+"Solaranlage_P5","BOOL","FX(36,5)","Außentemperatursensor gestört","61","",0,0,1,328194
 }
 IniOp: 0
 OpVars {
 "Magnetventil Fischwasser einschalten","nicht Magnetventil Fischwasser einschalten"="|Fischwasser_ein|||"
-"Zeit merken","nicht Zeit merken"="||ARI|z|time_sec"
+"Zeit merken","nicht Zeit merken"="||ARI|Solaranlage_Zeit|time_sec"
 }
 PVars {
 "Aussentemperatur > 4°C","nicht Aussentemperatur > 4°C"="|Solaranlage_P0|VGL|Teich_Luft_Temp>40|"
@@ -27,36 +28,40 @@ PVars {
 "Temperatur im Teich zu gross","nicht Temperatur im Teich zu gross"="|Solaranlage_P3|VGL|Teich_vorn_unten_Temp > Teich_Temp_max|"
 "Temperatursensor Teich vorn unten gestört","nicht Temperatursensor Teich vorn unten gestört"="|Solaranlage_P4|VGL|Teich_vorn_unten_Temp<=-50|"
 "Temperatursensor Solar gestört","nicht Temperatursensor Solar gestört"="|Solaranlage_P2|VGL|Solar_Ausgang_Temp<=-50|"
+"Außentemperatursensor gestört","nicht Außentemperatursensor gestört"="|Solaranlage_P5|VGL|Teich_Luft_Temp <= -50|"
 }
 O {
-(290,70),50,20 ,"",{1}
-(290,530),70,20 ,"",{0}
+(360,70),50,20 ,"",{1}
+(360,530),70,20 ,"",{0}
 }
 P {
-(290,300),70,20 ,0
-(290,450),70,20 ,1
-(290,370),90,20 ,2
-(290,230),80,20 ,3
-(290,150),70,20 ,4
-(490,450),70,20 ,1
+(360,300),70,20 ,0
+(360,450),70,20 ,1
+(360,370),90,20 ,2
+(360,230),80,20 ,3
+(360,150),70,20 ,4
+(560,450),70,20 ,1
+(160,300),100,20 ,5
 }
 A {
-y(290,490);(290,530)
-n(220,320);(170,320)
-n(220,470);(170,470);(170,320)
-(170,320);(170,250)
-(290,110);(290,150)
-n(290,190);(290,230)
-y(220,170);(170,170)
-y(210,250);(170,250)
-(170,250);(170,170)
-(170,170);(170,90);(240,90)
-n(290,270);(290,300)
-y(290,340);(290,370)
-y(380,390);(490,390);(490,450)
-n(290,410);(290,450)
-n(490,490);(490,550);(360,550)
-(290,570);(290,620);(620,620);(620,170);(360,170)
-y(560,470);(650,470);(650,90);(340,90)
+y(360,490);(360,530)
+n(290,470);(30,470);(30,320)
+(360,110);(360,150)
+n(360,190);(360,230)
+y(290,170);(30,170)
+y(280,250);(30,250)
+n(360,270);(360,300)
+y(360,340);(360,370)
+y(450,390);(560,390);(560,450)
+n(360,410);(360,450)
+n(560,490);(560,550);(430,550)
+(360,570);(360,620);(690,620);(690,170);(430,170)
+y(630,470);(720,470);(720,90);(410,90)
+n(290,320);(260,320)
+y(160,340);(160,390);(270,390)
+n(60,320);(30,320)
+(30,320);(30,250)
+(30,250);(30,170)
+(30,170);(30,90);(310,90)
 }
 }

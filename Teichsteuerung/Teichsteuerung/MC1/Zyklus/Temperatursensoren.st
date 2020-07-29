@@ -2,22 +2,22 @@
 { #define addnetworks true }
 { #define addcomments true }
 { #define addcontrolcomments false }
-FUNCTION_BLOCK Temperatursensoren
+FUNCTION Temperatursensoren : VOID
 // Automatisch generiert von TeCAD, bitte Änderungen nur dort vornehmen.
 { #define title "Temperatursensoren" }
 { #define author "TeCAD" }
 VAR
-  Temperatursensoren_Op0 : BYTE; // Operation 0 aktiv
-  Temperatursensoren_P0 : BOOL; // 10s vergangen
-  Temperatursensoren_P1 : BOOL; // weitere 10ms vergangen
-  zeit_merk AT %F(int16_t,8) : INT; // gemerkte Zeit
-  diff : INT;
+  Temperatursensoren_Op0 AT %F(33) : BYTE; // Operation 0 aktiv
+  Temperatursensoren_P0 AT %FX(34,0) : BOOL; // 10s vergangen
+  Temperatursensoren_P1 AT %FX(34,1) : BOOL; // weitere 10ms vergangen
+  zeit_merk AT %F(8) : INT; // gemerkte Zeit
+  diff AT %F(38) : INT;
 END_VAR
 VAR_EXTERNAL
   _INIT AT %FX(0,0) : BOOL; // Initialisierungsvariable
   Temperaturen_lesen AT %QX(0,1) : BOOL; // Temperaturen vom OneWire einlesen
   Temperaturen_einschalten AT %QX(0,6) : BOOL; // Spannung für Temperatursensoren einschalten
-  time_ms AT %F(int16_t,2) : INT; // Ticks in Sekunden als Umlaufzähler
+  time_ms AT %F(2) : INT; // Ticks in Sekunden als Umlaufzähler
 END_VAR
 VAR_TEMP
   _OV3 : BOOL;
@@ -88,4 +88,4 @@ IF _OV3 THEN
   diff := time_ms-zeit_merk;
 END_IF;
 
-END_FUNCTION_BLOCK
+END_FUNCTION

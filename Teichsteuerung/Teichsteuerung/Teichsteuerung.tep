@@ -1,6 +1,9 @@
 [Connection]
 ConnectionString=Data Source=%DBFILE%.mdb;Persist Security Info=False
 Provider=Microsoft.Jet.OLEDB.4.0
+DBFILE=
+DefaultDatabase=
+LoginPrompt=0
 [properties]
 LANGUAGE=C
 TRANSFER_TYPE=File

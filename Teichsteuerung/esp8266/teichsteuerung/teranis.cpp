@@ -26,12 +26,9 @@
   #include "teranis_code.h"
 #endif
 
-// Globale Instanz, da teranis_main ein Funktionsblock ist
-struct Zyklus I_Zyklus;
-
 void loop_teranis()
 {
-  Zyklus(&I_Zyklus);
+  Zyklus();
 }
 
 void setup_teranis()
