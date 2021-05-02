@@ -6,8 +6,14 @@ ModbusTCPSlave modbusTCPSlave;
 
 void setup(void)
 {
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  //pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
+
+  // Ausgänge konfigurieren
+  pinMode(D6,OUTPUT);
+  pinMode(D7,OUTPUT);
+  pinMode(D8,OUTPUT);
+  digitalWrite(D6,1); // Temperaturen ein
 
   setup_temperature();
   setup_wifi();
@@ -16,10 +22,6 @@ void setup(void)
 
   modbusTCPSlave.begin();
   
-  // Ausgänge konfigurieren
-  pinMode(D6,OUTPUT);
-  pinMode(D7,OUTPUT);
-  pinMode(D8,OUTPUT);
   setup_teranis();
 
   // Defaultwerte für Parameter
@@ -31,20 +33,19 @@ void setup(void)
   R(int16_t,10) = 190; // Teichtemperatur ab der auf heizen geschaltet wird
 }
 
-uint8_t oldi = 0;
-uint8_t oldq = 0;
-
-void ChangePrint(uint8_t newval, uint8_t &oldval, const char *text)
+void ChangePrint(uint16_t newval, uint16_t &oldval, const char *text)
 {
   if (newval!=oldval)
   {
     oldval = newval;
     char msg[50];
-    snprintf (msg, 49, "%ld: %s=%X",millis(),text,oldval);
+    snprintf (msg, 49, "%ld: %s = %X %d",millis(),text,oldval,oldval);
     TelnetMsg(msg);
     Serial.println(msg);
   }
 }
+
+#define CP(X) { static uint16_t old; ChangePrint(X,old,#X); }
 
 void loop(void)
 {
@@ -63,8 +64,9 @@ void loop(void)
   digitalWrite(D7,QX(0,2)); // Frischwasser
   digitalWrite(D6,QX(0,6)); // Temperaturen ein
 
-  ChangePrint(Inputs[0],oldi,"Input0");
-  ChangePrint(Outputs[0],oldq,"Output0");
+  CP(Inputs[0]);
+  CP(Outputs[0]);
+  CP(I(int16_t,12));
 
   modbusTCPSlave.Run();
   Telnet();

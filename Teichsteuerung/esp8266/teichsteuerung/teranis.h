@@ -8,6 +8,7 @@
 #define PLC_Q_SIZE 1 // Output Bytes
 #define PLC_F_SIZE 256 // Flags Bytes
 #define PLC_R_SIZE 256 // Remanent Flags Bytes
+#define PLC_S_SIZE 256 // System Flags Bytes
 
 typedef struct
 {
@@ -64,9 +65,15 @@ typedef struct
 #endif
 
 #if PLC_R_SIZE>0
-  extern uint8_t RFlags[PLC_F_SIZE];
+  extern uint8_t RFlags[PLC_R_SIZE];
   #define R(typ,idx) TREF(typ,RFlags,idx)
   #define RX(idx,bitnr) XREF(RFlags,idx,bitnr)
+#endif
+
+#if PLC_S_SIZE>0
+  extern uint8_t SFlags[PLC_S_SIZE];
+  #define S(typ,idx) TREF(typ,SFlags,idx)
+  #define SX(idx,bitnr) XREF(SFlags,idx,bitnr)
 #endif
 
 void setup_teranis();

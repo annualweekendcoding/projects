@@ -13,7 +13,11 @@
 #endif
 
 #if PLC_R_SIZE>0
-  uint8_t RFlags[PLC_F_SIZE];
+  uint8_t RFlags[PLC_R_SIZE];
+#endif
+
+#if PLC_S_SIZE>0
+  uint8_t SFlags[PLC_S_SIZE];
 #endif
 
 // Von TERANiS generierten Code einbinden

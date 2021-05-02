@@ -15,14 +15,14 @@
 // MODBUS Function Codes
 //
 #define MB_FC_NONE 0
-#define MB_FC_READ_COILS 1
-#define MB_FC_READ_DISCRETE_INPUT 2
-#define MB_FC_READ_REGISTERS 3              //implemented
-#define MB_FC_READ_INPUT_REGISTERS 4        //implemented
-#define MB_FC_WRITE_COIL 5
-#define MB_FC_WRITE_REGISTER 6              //implemented
-#define MB_FC_WRITE_MULTIPLE_COILS 15
-#define MB_FC_WRITE_MULTIPLE_REGISTERS 16   //implemented
+#define MB_FC_READ_REGISTERS 3            
+#define MB_FC_READ_INPUT_REGISTERS 4       
+#define MB_FC_WRITE_REGISTER 6             
+#define MB_FC_WRITE_MULTIPLE_REGISTERS 16
+#define MB_FC_READ_OUTPUT_REGISTERS 31
+#define MB_FC_READ_REMANENT_REGISTERS 32
+#define MB_FC_READ_SYSTEM_REGISTERS 33
+
 //
 // MODBUS Error Codes
 //
@@ -50,7 +50,7 @@ WiFiClient MBClient[MAX_MODBUS_CLIENTS];
 void ModbusTCPSlave::begin(){
   MBServer.begin();
   #ifdef MBDebug
-    Serial.print(F("Listening on "));
+    Serial.print("Listening on ");
     Serial.print(MB_PORT);
     Serial.println(" ...");
   #endif
@@ -140,6 +140,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
   // Handle request
 
   switch(byteFN) {
+#if PLC_F_SIZE>0          
       case MB_FC_READ_REGISTERS:  // 03 Read Holding Registers
           ByteDataLength = WordDataLength * 2;
           ByteArray[5] = ByteDataLength + 3; //Number of bytes after this one.
@@ -168,8 +169,9 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
             // Fehlercode zurückmelden
             byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
           }
-          break;
-          
+          break;          
+#endif          
+#if PLC_I_SIZE>0          
       case MB_FC_READ_INPUT_REGISTERS:  // 04 Read Input Registers
           Start = word(ByteArray[MB_TCP_REGISTER_START],ByteArray[MB_TCP_REGISTER_START+1]);
           WordDataLength = word(ByteArray[MB_TCP_REGISTER_NUMBER],ByteArray[MB_TCP_REGISTER_NUMBER+1]);
@@ -201,7 +203,8 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
             byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
           }
           break;
-          
+#endif          
+#if PLC_F_SIZE>0                    
       case MB_FC_WRITE_REGISTER:  // 06 Write Holding Register
           if ((Start*2+1)<PLC_F_SIZE)
           {
@@ -221,7 +224,7 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
                 Serial.print("Write Holding Register: ");
                 Serial.print(Start);
                 Serial.print("=");
-                Serial.println((Start*2+1<PLC_F_SIZE) ? F(uint16_t,Start*2) : -1);
+                Serial.println((Start*2+1<PLC_F_SIZE) ? *((uint16_t*)(&Flags[Start*2])) : -1);
             #endif
           }
           else 
@@ -230,7 +233,6 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
             byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
           }
           break;
-          
       case MB_FC_WRITE_MULTIPLE_REGISTERS:    //16 Write Holding Registers
           ByteDataLength = WordDataLength * 2;
           ByteArray[5] = ByteDataLength + 3; //Number of bytes after this one.
@@ -263,6 +265,100 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
             byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
           }
           break;
+#endif          
+#if PLC_Q_SIZE>0          
+      case MB_FC_READ_OUTPUT_REGISTERS:
+          ByteDataLength = WordDataLength * 2;
+          ByteArray[5] = ByteDataLength + 3; //Number of bytes after this one.
+          ByteArray[8] = ByteDataLength;     //Number of bytes after this one (or number of bytes of data).
+          if (((Start+WordDataLength)*2)<PLC_Q_SIZE)
+          {
+            for(int i = 0; i < WordDataLength; i++)
+            {
+              // Register von Outputs umspeichern, Bytes dabei drehen
+              ByteArray[ 9 + i * 2] = Outputs[(Start + i)*2 +1];
+              ByteArray[10 + i * 2] = Outputs[(Start + i)*2];
+            }
+            MessageLength = ByteDataLength + 9;
+            client.write((const uint8_t *)ByteArray,MessageLength);
+            #ifdef MBDebug
+                Serial.print("TX: ");
+                for (byte thisByte = 0; thisByte <= MessageLength; thisByte++) {
+                    Serial.print(ByteArray[thisByte], DEC);
+                    Serial.print("-");
+                }
+                Serial.println();
+            #endif
+          }  
+          else 
+          {
+            // Fehlercode zurückmelden
+            byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
+          }
+          break;
+#endif          
+#if PLC_R_SIZE>0          
+      case MB_FC_READ_REMANENT_REGISTERS:
+          ByteDataLength = WordDataLength * 2;
+          ByteArray[5] = ByteDataLength + 3; //Number of bytes after this one.
+          ByteArray[8] = ByteDataLength;     //Number of bytes after this one (or number of bytes of data).
+          if (((Start+WordDataLength)*2)<PLC_R_SIZE)
+          {
+            for(int i = 0; i < WordDataLength; i++)
+            {
+              // Register von Outputs umspeichern, Bytes dabei drehen
+              ByteArray[ 9 + i * 2] = RFlags[(Start + i)*2 +1];
+              ByteArray[10 + i * 2] = RFlags[(Start + i)*2];
+            }
+            MessageLength = ByteDataLength + 9;
+            client.write((const uint8_t *)ByteArray,MessageLength);
+            #ifdef MBDebug
+                Serial.print("TX: ");
+                for (byte thisByte = 0; thisByte <= MessageLength; thisByte++) {
+                    Serial.print(ByteArray[thisByte], DEC);
+                    Serial.print("-");
+                }
+                Serial.println();
+            #endif
+          }  
+          else 
+          {
+            // Fehlercode zurückmelden
+            byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
+          }
+          break;
+#endif          
+#if PLC_S_SIZE>0          
+      case MB_FC_READ_SYSTEM_REGISTERS:
+          ByteDataLength = WordDataLength * 2;
+          ByteArray[5] = ByteDataLength + 3; //Number of bytes after this one.
+          ByteArray[8] = ByteDataLength;     //Number of bytes after this one (or number of bytes of data).
+          if (((Start+WordDataLength)*2)<PLC_S_SIZE)
+          {
+            for(int i = 0; i < WordDataLength; i++)
+            {
+              // Register von Outputs umspeichern, Bytes dabei drehen
+              ByteArray[ 9 + i * 2] = SFlags[(Start + i)*2 +1];
+              ByteArray[10 + i * 2] = SFlags[(Start + i)*2];
+            }
+            MessageLength = ByteDataLength + 9;
+            client.write((const uint8_t *)ByteArray,MessageLength);
+            #ifdef MBDebug
+                Serial.print("TX: ");
+                for (byte thisByte = 0; thisByte <= MessageLength; thisByte++) {
+                    Serial.print(ByteArray[thisByte], DEC);
+                    Serial.print("-");
+                }
+                Serial.println();
+            #endif
+          }  
+          else 
+          {
+            // Fehlercode zurückmelden
+            byteEC = MB_EC_ILLEGAL_DATA_ADDRESS;
+          }
+          break;
+#endif          
       default:
          // ungültiger Funktionscode
          byteEC = MB_EC_ILLEGAL_FUNCTION;     
@@ -272,9 +368,11 @@ void ModbusTCPSlave::Receive(WiFiClient &client)
     #ifdef MBDebug
       Serial.print("Modbus Fehler: ");
       Serial.print(byteEC);
-      Serial.print(" von ");
+      Serial.print(" FC ");
+      Serial.print(byteFN);
+      Serial.print(" offset ");
       Serial.print(Start);
-      Serial.print(" bis ");
+      Serial.print(" len ");
       Serial.println(WordDataLength);
     #endif
     ByteArray[MB_TCP_FUNC] |= 0x80; // Im Code Bit 7 setzen
